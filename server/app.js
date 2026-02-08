@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 
@@ -21,13 +22,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Routes will be added here
+// API Routes
 app.get('/api', (req, res) => {
   res.json({ 
     message: 'Welcome to Civic Sense Portal API',
-    version: '1.0.0'
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      issues: '/api/issues (coming soon)',
+      departments: '/api/departments (coming soon)'
+    }
   });
 });
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
