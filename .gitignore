@@ -1,5 +1,5 @@
 #md files
-*.md
+/*.md
 
 #no readme
 !README.md
