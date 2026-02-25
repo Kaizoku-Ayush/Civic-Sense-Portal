@@ -1,5 +1,5 @@
 import { verifyIdToken } from '../config/firebase.js';
-import { query } from '../config/db.js';
+import User from '../models/User.js';
 
 /**
  * Middleware to verify Firebase authentication token
@@ -23,12 +23,9 @@ export const authenticate = async (req, res, next) => {
     const decodedToken = await verifyIdToken(idToken);
     
     // Fetch user from database
-    const result = await query(
-      'SELECT * FROM users WHERE firebase_uid = $1',
-      [decodedToken.uid]
-    );
+    const user = await User.findOne({ firebaseUid: decodedToken.uid });
     
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: 'User not found in database'
@@ -36,7 +33,7 @@ export const authenticate = async (req, res, next) => {
     }
     
     // Attach user to request object
-    req.user = result.rows[0];
+    req.user = user;
     req.firebaseUser = decodedToken;
     
     next();
@@ -102,13 +99,10 @@ export const optionalAuth = async (req, res, next) => {
     const idToken = authHeader.split('Bearer ')[1];
     const decodedToken = await verifyIdToken(idToken);
     
-    const result = await query(
-      'SELECT * FROM users WHERE firebase_uid = $1',
-      [decodedToken.uid]
-    );
+    const user = await User.findOne({ firebaseUid: decodedToken.uid });
     
-    if (result.rows.length > 0) {
-      req.user = result.rows[0];
+    if (user) {
+      req.user = user;
       req.firebaseUser = decodedToken;
     }
     

@@ -1,3 +1,9 @@
+#md files
+*.md
+
+#no readme
+!README.md
+
 #dataset folder
 dataset/
 

@@ -22,7 +22,7 @@
 
 ### BACKEND
 - Node.js + Express.js
-- PostgreSQL + PostGIS (geospatial queries)
+- MongoDB + Mongoose (with 2dsphere indexes for geospatial queries)
 - Socket.io (real-time updates)
 - Multer (file uploads)
 - JWT (authentication)
@@ -110,15 +110,15 @@ civic_dataset/
 - [ ] Create project folder structure
 - [ ] Initialize React app with Vite: `npm create vite@latest client`
 - [ ] Initialize Node.js backend: `npm init`
-- [ ] Setup PostgreSQL database locally
-- [ ] Install PostGIS extension
+- [ ] Create MongoDB Atlas account (free M0 cluster at mongodb.com/atlas)
+- [ ] Get MongoDB connection string
 
 **Afternoon:**
 - [ ] Setup Git repository
 - [ ] Create .gitignore, README.md
 - [ ] Install core dependencies:
   - Frontend: react-router-dom, axios, tailwindcss, leaflet
-  - Backend: express, pg, cors, dotenv, multer, jsonwebtoken
+  - Backend: express, mongoose, cors, dotenv, multer, jsonwebtoken
 
 **Evening:**
 - [ ] Configure Tailwind CSS
@@ -135,9 +135,9 @@ civic_dataset/
 #### DAY 2 (Feb 3) - Database & Auth
 
 **Morning:**
-- [ ] Design database schema (see SCHEMA section below)
-- [ ] Create SQL migration files
-- [ ] Run migrations to create tables
+- [ ] Define Mongoose schemas (User, Issue, Department - see SCHEMA section)
+- [ ] Create model files in `server/models/`
+- [ ] Test MongoDB connection
 
 **Afternoon:**
 - [ ] Setup Firebase Auth project
@@ -149,22 +149,22 @@ civic_dataset/
 - [ ] Test auth flow end-to-end
 - [ ] Setup protected routes in React
 
-#### DAY 3 (Feb 4) - Download & Prepare Datasets
+#### DAY 3 (Feb 4) - Prepare & Explore Datasets
 
 **Morning:**
-- [ ] Download RDD2022 dataset from GitHub
-- [ ] Download TACO dataset
-- [ ] Download Kaggle Garbage dataset
+- [ ] Explore pothole dataset: `dataset/potholes/Pothole_Segmentation_YOLOv8/`
+- [ ] Explore road damage dataset: `dataset/road damage/India/`
+- [ ] Explore garbage datasets: `dataset/garbage/TACO/` and `dataset/garbage/archive/`
 
 **Afternoon:**
-- [ ] Write Python script to organize datasets
-- [ ] Sample and balance classes
+- [ ] Write Python script to convert all datasets to a unified classification format
+- [ ] Sample and balance classes across 3 categories (pothole, road_damage, garbage)
 - [ ] Create train/validation/test splits (70/15/15)
 
 **Evening:**
-- [ ] Verify dataset structure
+- [ ] Verify unified dataset structure
 - [ ] Calculate class distribution
-- [ ] Plan augmentation strategy for small classes
+- [ ] Plan augmentation strategy for smaller classes (pothole, road_damage)
 
 #### DAY 4 (Feb 5) - AI Model Training (Part 1)
 
@@ -594,7 +594,7 @@ civic_dataset/
 #### DAY 27 (Feb 28) - Deployment
 
 **Morning:**
-- [ ] Deploy PostgreSQL to Railway/Supabase
+- [ ] Deploy MongoDB Atlas cluster (free M0 tier at mongodb.com/atlas)
 - [ ] Deploy Node.js backend to Railway/Render
 - [ ] Deploy FastAPI to Railway/Hugging Face Spaces
 
@@ -635,106 +635,78 @@ civic_dataset/
 
 ---
 
-## DATABASE SCHEMA
+## DATABASE SCHEMA (MongoDB / Mongoose)
 
-```sql
--- Enable PostGIS
-CREATE EXTENSION IF NOT EXISTS postgis;
+```javascript
+// User Schema
+const userSchema = new mongoose.Schema({
+  firebaseUid:  { type: String, required: true, unique: true },
+  email:        { type: String, required: true, unique: true },
+  name:         { type: String, required: true },
+  phone:        { type: String, default: null },
+  role:         { type: String, enum: ['CITIZEN','ADMIN','DEPARTMENT_STAFF'], default: 'CITIZEN' },
+  departmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null },
+  civicPoints:  { type: Number, default: 0 },
+  avatarUrl:    { type: String, default: null },
+}, { timestamps: true });
 
--- Users table
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    firebase_uid VARCHAR(128) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
-    role VARCHAR(20) DEFAULT 'CITIZEN' CHECK (role IN ('CITIZEN', 'ADMIN', 'DEPARTMENT_STAFF')),
-    department_id UUID REFERENCES departments(id),
-    civic_points INTEGER DEFAULT 0,
-    avatar_url TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// Department Schema
+const departmentSchema = new mongoose.Schema({
+  name:        { type: String, required: true },
+  email:       String,
+  phone:       String,
+  zonePolygon: { type: { type: String, enum: ['Polygon'] }, coordinates: [[[Number]]] }, // GeoJSON
+}, { timestamps: true });
 
--- Departments table
-CREATE TABLE departments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255),
-    phone VARCHAR(20),
-    zone_polygon GEOMETRY(POLYGON, 4326),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// Issue Schema
+const issueSchema = new mongoose.Schema({
+  userId:              { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title:               String,
+  description:         String,
+  category:            { type: String, required: true },  // 'pothole' | 'road_damage' | 'garbage'
+  aiCategory:          String,
+  aiConfidence:        Number,
+  aiSeverityScore:     Number,
+  imageUrl:            { type: String, required: true },
+  imageHash:           String,
+  location: {
+    type:        { type: String, enum: ['Point'], required: true },
+    coordinates: { type: [Number], required: true }        // [longitude, latitude]
+  },
+  address:             String,
+  status:              { type: String, enum: ['PENDING','ACKNOWLEDGED','IN_PROGRESS','RESOLVED','REJECTED','DUPLICATE'], default: 'PENDING' },
+  priority:            { type: String, enum: ['LOW','MEDIUM','HIGH','CRITICAL'], default: 'MEDIUM' },
+  assignedDepartment:  { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null },
+  assignedUser:        { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  duplicateOf:         { type: mongoose.Schema.Types.ObjectId, ref: 'Issue', default: null },
+  resolvedAt:          Date,
+  resolutionImageUrl:  String,
+  resolutionNotes:     String,
+}, { timestamps: true });
 
--- Issues table
-CREATE TABLE issues (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) NOT NULL,
-    title VARCHAR(200),
-    description TEXT,
-    category VARCHAR(50) NOT NULL,
-    ai_category VARCHAR(50),
-    ai_confidence DECIMAL(5,4),
-    ai_severity_score DECIMAL(3,2),
-    image_url TEXT NOT NULL,
-    image_hash VARCHAR(64),
-    location GEOMETRY(POINT, 4326) NOT NULL,
-    address TEXT,
-    status VARCHAR(20) DEFAULT 'PENDING' 
-        CHECK (status IN ('PENDING', 'ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'DUPLICATE')),
-    priority VARCHAR(10) DEFAULT 'MEDIUM' CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
-    assigned_department_id UUID REFERENCES departments(id),
-    assigned_user_id UUID REFERENCES users(id),
-    duplicate_of UUID REFERENCES issues(id),
-    resolved_at TIMESTAMP,
-    resolution_image_url TEXT,
-    resolution_notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// 2dsphere index for geospatial queries (replaces PostGIS)
+issueSchema.index({ location: '2dsphere' });
+departmentSchema.index({ zonePolygon: '2dsphere' });
 
--- Issue updates/timeline table
-CREATE TABLE issue_updates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    issue_id UUID REFERENCES issues(id) NOT NULL,
-    user_id UUID REFERENCES users(id),
-    old_status VARCHAR(20),
-    new_status VARCHAR(20),
-    comment TEXT,
-    is_public BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// Issue Updates / Timeline Schema
+const issueUpdateSchema = new mongoose.Schema({
+  issueId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Issue', required: true },
+  userId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  oldStatus: String,
+  newStatus: String,
+  comment:   String,
+  isPublic:  { type: Boolean, default: true },
+}, { timestamps: true });
 
--- Routing rules table
-CREATE TABLE routing_rules (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    category VARCHAR(50) NOT NULL,
-    department_id UUID REFERENCES departments(id) NOT NULL,
-    zone_polygon GEOMETRY(POLYGON, 4326),
-    priority INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Notifications table
-CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) NOT NULL,
-    issue_id UUID REFERENCES issues(id),
-    type VARCHAR(50) NOT NULL,
-    title VARCHAR(200) NOT NULL,
-    message TEXT,
-    is_read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes for performance
-CREATE INDEX idx_issues_location ON issues USING GIST(location);
-CREATE INDEX idx_issues_status ON issues(status);
-CREATE INDEX idx_issues_category ON issues(category);
-CREATE INDEX idx_issues_user ON issues(user_id);
-CREATE INDEX idx_issues_created ON issues(created_at);
-CREATE INDEX idx_issues_image_hash ON issues(image_hash);
+// Notification Schema
+const notificationSchema = new mongoose.Schema({
+  userId:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  issueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' },
+  type:    { type: String, required: true },
+  title:   { type: String, required: true },
+  message: String,
+  isRead:  { type: Boolean, default: false },
+}, { timestamps: true });
 ```
 
 ---
@@ -840,7 +812,7 @@ civic-sense-portal/
 │
 ├── server/                          # Node.js Backend
 │   ├── config/
-│   │   ├── db.js                    # PostgreSQL connection
+│   │   ├── db.js                    # MongoDB connection (Mongoose)
 │   │   └── firebase.js              # Firebase Admin SDK
 │   ├── controllers/
 │   │   ├── authController.js
@@ -1053,7 +1025,7 @@ cd ..
 # Backend
 mkdir server && cd server
 npm init -y
-npm install express pg cors dotenv multer jsonwebtoken socket.io firebase-admin
+npm install express mongoose cors dotenv multer jsonwebtoken socket.io firebase-admin
 npm install -D nodemon
 cd ..
 
@@ -1064,11 +1036,12 @@ venv\Scripts\activate  # Windows
 pip install fastapi uvicorn tensorflow pillow imagehash python-multipart
 cd ..
 
-# Database
-psql -U postgres
-CREATE DATABASE civic_sense;
-\c civic_sense
-CREATE EXTENSION postgis;
+# MongoDB Atlas (Free Tier)
+# 1. Go to https://www.mongodb.com/atlas/database
+# 2. Create a free M0 cluster
+# 3. Add your IP to allowed list
+# 4. Create a database user
+# 5. Copy the connection string to MONGODB_URI in your .env file
 ```
 
 ---
@@ -1092,9 +1065,10 @@ CREATE EXTENSION postgis;
 ## CONTACT & RESOURCES
 
 ### Dataset Links
-- **RDD2022:** https://github.com/sekilab/RoadDamageDetector
-- **TACO:** http://tacodataset.org/
-- **Garbage:** https://www.kaggle.com/datasets/asdasdasasdas/garbage-classification
+- **Pothole Dataset (YOLOv8):** `dataset/potholes/Pothole_Segmentation_YOLOv8/` (already downloaded)
+- **Road Damage (India):** `dataset/road damage/India/` (already downloaded)
+- **TACO:** `dataset/garbage/TACO/` (already downloaded)
+- **Garbage Classification:** `dataset/garbage/archive/` (already downloaded)
 
 ### Helpful Tutorials
 - **Transfer Learning:** https://www.tensorflow.org/tutorials/images/transfer_learning

@@ -1,5 +1,5 @@
-import { query, transaction } from '../config/db.js';
-import { verifyIdToken, getUserByUid } from '../config/firebase.js';
+import { verifyIdToken } from '../config/firebase.js';
+import User from '../models/User.js';
 
 /**
  * Register a new user or login existing user
@@ -21,28 +21,26 @@ export const register = async (req, res) => {
     const { uid, email } = decodedToken;
     
     // Check if user already exists
-    const existingUser = await query(
-      'SELECT * FROM users WHERE firebase_uid = $1 OR email = $2',
-      [uid, email]
-    );
+    const existingUser = await User.findOne({
+      $or: [{ firebaseUid: uid }, { email }]
+    });
     
-    if (existingUser.rows.length > 0) {
+    if (existingUser) {
       return res.status(200).json({
         success: true,
         message: 'User already registered',
-        user: existingUser.rows[0]
+        user: existingUser
       });
     }
     
     // Create new user in database
-    const result = await query(
-      `INSERT INTO users (firebase_uid, email, name, phone, role)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [uid, email, name || email.split('@')[0], phone || null, 'CITIZEN']
-    );
-    
-    const newUser = result.rows[0];
+    const newUser = await User.create({
+      firebaseUid: uid,
+      email,
+      name: name || email.split('@')[0],
+      phone: phone || undefined,
+      role: 'CITIZEN'
+    });
     
     res.status(201).json({
       success: true,
@@ -80,35 +78,28 @@ export const login = async (req, res) => {
     const { uid, email } = decodedToken;
     
     // Get user from database
-    const result = await query(
-      'SELECT * FROM users WHERE firebase_uid = $1',
-      [uid]
-    );
+    let user = await User.findOne({ firebaseUid: uid });
     
-    if (result.rows.length === 0) {
+    if (!user) {
       // User not in database, auto-register
-      const newUserResult = await query(
-        `INSERT INTO users (firebase_uid, email, name, role)
-         VALUES ($1, $2, $3, $4)
-         RETURNING *`,
-        [uid, email, email.split('@')[0], 'CITIZEN']
-      );
+      user = await User.create({
+        firebaseUid: uid,
+        email,
+        name: email.split('@')[0],
+        role: 'CITIZEN'
+      });
       
       return res.status(201).json({
         success: true,
         message: 'User auto-registered',
-        user: newUserResult.rows[0],
+        user,
         isNewUser: true
       });
     }
     
-    const user = result.rows[0];
-    
-    // Update last login
-    await query(
-      'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-      [user.id]
-    );
+    // Update last login timestamp
+    user.updatedAt = new Date();
+    await user.save();
     
     res.status(200).json({
       success: true,
@@ -134,17 +125,9 @@ export const login = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     // req.user is set by authenticate middleware
-    const userId = req.user.id;
+    const user = await User.findById(req.user._id).populate('departmentId', 'name');
     
-    const result = await query(
-      `SELECT u.*, d.name as department_name
-       FROM users u
-       LEFT JOIN departments d ON u.department_id = d.id
-       WHERE u.id = $1`,
-      [userId]
-    );
-    
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
@@ -153,7 +136,7 @@ export const getProfile = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      user: result.rows[0]
+      user
     });
     
   } catch (error) {
@@ -172,48 +155,30 @@ export const getProfile = async (req, res) => {
  */
 export const updateProfile = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { name, phone, avatar_url } = req.body;
+    const { name, phone, avatarUrl } = req.body;
+    const allowedUpdates = {};
     
-    // Build dynamic update query
-    const updates = [];
-    const values = [];
-    let paramCount = 1;
+    if (name !== undefined) allowedUpdates.name = name;
+    if (phone !== undefined) allowedUpdates.phone = phone;
+    if (avatarUrl !== undefined) allowedUpdates.avatarUrl = avatarUrl;
     
-    if (name !== undefined) {
-      updates.push(`name = $${paramCount++}`);
-      values.push(name);
-    }
-    if (phone !== undefined) {
-      updates.push(`phone = $${paramCount++}`);
-      values.push(phone);
-    }
-    if (avatar_url !== undefined) {
-      updates.push(`avatar_url = $${paramCount++}`);
-      values.push(avatar_url);
-    }
-    
-    if (updates.length === 0) {
+    if (Object.keys(allowedUpdates).length === 0) {
       return res.status(400).json({
         success: false,
         message: 'No valid fields to update'
       });
     }
     
-    values.push(userId);
-    
-    const result = await query(
-      `UPDATE users 
-       SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $${paramCount}
-       RETURNING *`,
-      values
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { ...allowedUpdates },
+      { new: true, runValidators: true }
     );
     
     res.status(200).json({
       success: true,
       message: 'Profile updated successfully',
-      user: result.rows[0]
+      user: updatedUser
     });
     
   } catch (error) {
@@ -232,12 +197,7 @@ export const updateProfile = async (req, res) => {
  */
 export const deleteAccount = async (req, res) => {
   try {
-    const userId = req.user.id;
-    
-    await transaction(async (client) => {
-      // Delete user (cascade will handle related records)
-      await client.query('DELETE FROM users WHERE id = $1', [userId]);
-    });
+    await User.findByIdAndDelete(req.user._id);
     
     res.status(200).json({
       success: true,
