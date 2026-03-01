@@ -1,2 +1,2 @@
 // Custom React hooks
-// Examples: useAuth, useIssues, useMap, etc.
+export { useAuth } from '../context/AuthContext';

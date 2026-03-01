@@ -1,2 +1,2 @@
-// Common reusable components will be placed here
-// Examples: Button, Input, Card, Modal, etc.
+// Common reusable components
+export { default as ProtectedRoute } from './ProtectedRoute';

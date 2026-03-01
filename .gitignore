@@ -1,7 +1,7 @@
 #md files
 /*.md
 
-#no readme
+#exception files
 !README.md
 
 #dataset folder
@@ -20,6 +20,9 @@ pnpm-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Firebase service account key (sensitive - never commit)
+*firebase-service-account*.json
 
 # Build outputs
 dist/
@@ -49,13 +52,18 @@ ENV/
 .pytest_cache/
 
 # AI Models & Datasets
+# (run prepare_dataset.py locally to regenerate)
 datasets/
+ai-service/data/
+ai-service/models/
 *.h5
 *.pkl
 *.pth
 *.pt
 *.onnx
 *.tflite
+*.pb
+saved_model/
 
 # Logs
 logs/

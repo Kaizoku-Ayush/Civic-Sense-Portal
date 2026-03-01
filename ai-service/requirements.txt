@@ -1,0 +1,31 @@
+# Core ML stack
+tensorflow==2.20.*
+numpy>=2.0
+
+# Image processing
+opencv-python-headless>=4.9
+Pillow>=10.3
+
+# Data utilities
+scikit-learn>=1.4
+matplotlib>=3.8
+seaborn>=0.13
+
+# Augmentation (heavy transforms for pothole class)
+albumentations>=1.4
+
+# Hashing (duplicate detection)
+imagehash>=4.3
+
+# FastAPI service (Day 6+)
+fastapi>=0.111
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+
+# Cloudinary SDK (for production image fetching)
+cloudinary>=1.40
+
+# Dev / notebook
+ipykernel>=6.29
+jupyterlab>=4.1

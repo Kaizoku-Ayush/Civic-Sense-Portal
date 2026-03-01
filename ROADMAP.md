@@ -107,22 +107,22 @@ civic_dataset/
 #### DAY 1 (Feb 2) - Project Setup
 
 **Morning:**
-- [ ] Create project folder structure
-- [ ] Initialize React app with Vite: `npm create vite@latest client`
-- [ ] Initialize Node.js backend: `npm init`
-- [ ] Create MongoDB Atlas account (free M0 cluster at mongodb.com/atlas)
-- [ ] Get MongoDB connection string
+- [x] Create project folder structure
+- [x] Initialize React app with Vite: `npm create vite@latest client`
+- [x] Initialize Node.js backend: `npm init`
+- [x] Create MongoDB Atlas account (free M0 cluster at mongodb.com/atlas)
+- [x] Get MongoDB connection string
 
 **Afternoon:**
-- [ ] Setup Git repository
-- [ ] Create .gitignore, README.md
-- [ ] Install core dependencies:
+- [x] Setup Git repository
+- [x] Create .gitignore, README.md
+- [x] Install core dependencies:
   - Frontend: react-router-dom, axios, tailwindcss, leaflet
   - Backend: express, mongoose, cors, dotenv, multer, jsonwebtoken
 
 **Evening:**
-- [ ] Configure Tailwind CSS
-- [ ] Create basic folder structure:
+- [x] Configure Tailwind CSS
+- [x] Create basic folder structure:
   ```
   client/src/components/
   client/src/pages/
@@ -135,36 +135,36 @@ civic_dataset/
 #### DAY 2 (Feb 3) - Database & Auth
 
 **Morning:**
-- [ ] Define Mongoose schemas (User, Issue, Department - see SCHEMA section)
-- [ ] Create model files in `server/models/`
-- [ ] Test MongoDB connection
+- [x] Define Mongoose schemas (User, Issue, Department - see SCHEMA section)
+- [x] Create model files in `server/models/`
+- [x] Test MongoDB connection
 
 **Afternoon:**
-- [ ] Setup Firebase Auth project
-- [ ] Implement Firebase Auth in React
-- [ ] Create Login/Register pages
-- [ ] Create auth middleware for backend
+- [x] Setup Firebase Auth project
+- [x] Implement Firebase Auth in React
+- [x] Create Login/Register pages
+- [x] Create auth middleware for backend
 
 **Evening:**
-- [ ] Test auth flow end-to-end
-- [ ] Setup protected routes in React
+- [x] Test auth flow end-to-end
+- [x] Setup protected routes in React
 
 #### DAY 3 (Feb 4) - Prepare & Explore Datasets
 
 **Morning:**
-- [ ] Explore pothole dataset: `dataset/potholes/Pothole_Segmentation_YOLOv8/`
-- [ ] Explore road damage dataset: `dataset/road damage/India/`
-- [ ] Explore garbage datasets: `dataset/garbage/TACO/` and `dataset/garbage/archive/`
+- [x] Explore pothole dataset: `dataset/potholes/Pothole_Segmentation_YOLOv8/`
+- [x] Explore road damage dataset: `dataset/road damage/India/`
+- [x] Explore garbage datasets: `dataset/garbage/TACO/` and `dataset/garbage/archive/`
 
 **Afternoon:**
-- [ ] Write Python script to convert all datasets to a unified classification format
-- [ ] Sample and balance classes across 3 categories (pothole, road_damage, garbage)
-- [ ] Create train/validation/test splits (70/15/15)
+- [x] Write Python script to convert all datasets to a unified classification format
+- [x] Sample and balance classes across 3 categories (pothole, road_damage, garbage)
+- [x] Create train/validation/test splits (70/15/15)
 
 **Evening:**
-- [ ] Verify unified dataset structure
-- [ ] Calculate class distribution
-- [ ] Plan augmentation strategy for smaller classes (pothole, road_damage)
+- [x] Verify unified dataset structure
+- [x] Calculate class distribution
+- [x] Plan augmentation strategy for smaller classes (pothole, road_damage)
 
 #### DAY 4 (Feb 5) - AI Model Training (Part 1)
 

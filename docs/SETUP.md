@@ -3,9 +3,10 @@
 ## Prerequisites
 
 - Node.js 20.x or higher
-- Python 3.10 or higher
-- PostgreSQL 14+ with PostGIS extension
+- Python 3.10+ (for AI service)
 - npm or yarn
+- A [MongoDB Atlas](https://cloud.mongodb.com/) free account
+- A [Firebase](https://console.firebase.google.com/) project with Authentication enabled
 
 ## Step-by-Step Setup
 
@@ -19,8 +20,9 @@ cd Civic-Sense-Portal
 ```bash
 cd client
 npm install
-cp .env.example .env
-# Edit .env with your configuration
+copy .env.example .env   # Windows
+# cp .env.example .env   # macOS/Linux
+# Edit .env with your Firebase config and API URL
 npm run dev
 ```
 
@@ -30,29 +32,29 @@ The frontend will be available at http://localhost:3000
 ```bash
 cd server
 npm install
-cp .env.example .env
-# Edit .env with your database and API keys
+copy .env.example .env   # Windows
+# cp .env.example .env   # macOS/Linux
+# Edit .env with your MongoDB URI and Firebase credentials
 npm run dev
 ```
 
 The backend will be available at http://localhost:5000
 
-### 4. Database Setup
-```bash
-# Access PostgreSQL
-psql -U postgres
+### 4. Database Setup (MongoDB Atlas)
+1. Create a free M0 cluster at https://cloud.mongodb.com/
+2. Create a database user and whitelist your IP
+3. Copy the connection string into `server/.env` as `MONGODB_URI`
+4. The app auto-creates collections and indexes on first run
 
-# Create database
-CREATE DATABASE civic_sense;
+### 5. Firebase Setup
+1. Go to https://console.firebase.google.com/
+2. Create a new project
+3. Enable **Email/Password** and **Google** sign-in providers
+4. Copy the Web App config into `client/.env`
+5. Go to **Project Settings > Service Accounts** > Generate new private key
+6. Save the JSON file as `server/firebase-service-account.json` (already gitignored)
 
-# Connect to database
-\c civic_sense
-
-# Enable PostGIS extension
-CREATE EXTENSION postgis;
-```
-
-### 5. AI Service Setup (Optional - to be done in Week 1 Day 4-6)
+### 6. AI Service Setup (Week 1, Days 4-6)
 ```bash
 cd ai-service
 python -m venv venv
@@ -67,41 +69,33 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run the service
-uvicorn app.main:app --reload --port 8000
+uvicorn main:app --reload --port 8000
 ```
 
-## Environment Variables
+## Environment Variables Reference
 
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:5000/api
-VITE_FIREBASE_API_KEY=your_key_here
-```
-
-### Backend (.env)
-```
-PORT=5000
-DATABASE_URL=postgresql://user:password@localhost:5432/civic_sense
-JWT_SECRET=your_secret_key
-CLOUDINARY_URL=your_cloudinary_url
-AI_SERVICE_URL=http://localhost:8000
-```
+See `client/.env.example` and `server/.env.example` for the full list
+of required variables with descriptions.
 
 ## Troubleshooting
 
 ### Port Already in Use
-If you get a "port already in use" error, either:
-- Kill the process using that port
-- Change the port in the configuration
+If you get a "port already in use" error:
+- Kill the process: `npx kill-port 3000` or `npx kill-port 5000`
+- Or change `PORT` in the respective `.env` file
 
-### Database Connection Issues
-- Ensure PostgreSQL is running
-- Check your database credentials in .env
-- Verify the database exists
+### MongoDB Connection Issues
+- Ensure your IP is whitelisted in MongoDB Atlas Network Access
+- Verify the `MONGODB_URI` connection string in `server/.env`
+
+### Firebase Auth Not Working
+- Make sure Email/Password provider is enabled in Firebase Console
+- Double-check `VITE_FIREBASE_*` values in `client/.env`
+- For the backend, ensure `firebase-service-account.json` is in `server/`
 
 ### Module Not Found
-Run `npm install` in the respective directory (client or server)
+Run `npm install` in the relevant directory (`client/` or `server/`)
 
 ## Next Steps
 
-Once setup is complete, refer to [ROADMAP.md](../ROADMAP.md) for development tasks.
+See [ROADMAP.md](../ROADMAP.md) for the full 4-week development plan.
