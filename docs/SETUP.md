@@ -54,7 +54,7 @@ The backend will be available at http://localhost:5000
 5. Go to **Project Settings > Service Accounts** > Generate new private key
 6. Save the JSON file as `server/firebase-service-account.json` (already gitignored)
 
-### 6. AI Service Setup (Week 1, Days 4-6)
+### 6. AI Service Setup
 ```bash
 cd ai-service
 python -m venv venv
@@ -68,9 +68,12 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the service
-uvicorn main:app --reload --port 8000
+# Run the service (main.py lives inside the app/ package)
+uvicorn app.main:app --reload --port 8000
 ```
+
+The AI service will be available at http://localhost:8000.  
+The Vite dev server proxies `/ai/*` → `http://localhost:8000` automatically — no extra env var needed during development.
 
 ## Environment Variables Reference
 
@@ -98,4 +101,23 @@ Run `npm install` in the relevant directory (`client/` or `server/`)
 
 ## Next Steps
 
-See [ROADMAP.md](../ROADMAP.md) for the full 4-week development plan.
+See [ROADMAP.md](../ROADMAP.md) for the 7-day sprint plan.
+
+## Running All Three Services
+
+For full functionality, run all three services simultaneously:
+
+| Service | Directory | Command | Port |
+|---------|-----------|---------|------|
+| Frontend | `client/` | `npm run dev` | 3000 |
+| Backend | `server/` | `npm run dev` | 5000 |
+| AI Service | `ai-service/` | `uvicorn app.main:app --reload --port 8000` | 8000 |
+
+**Pages available once all services are running:**
+- `/submit` — Report a new issue (with AI preview)
+- `/issues` — Browse all reported issues
+- `/issues/:id` — Full issue detail + AI analysis
+- `/map` — Live map with clustered markers
+- `/admin` — Admin dashboard (role: ADMIN)
+- `/department` — Department staff queue (role: DEPARTMENT_STAFF)
+- `/my-reports` — Your submission history

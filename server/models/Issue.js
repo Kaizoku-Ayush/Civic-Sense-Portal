@@ -35,11 +35,11 @@ const issueSchema = new mongoose.Schema(
       max: 1,
       default: null,
     },
-    // AI severity score (0-10)
+    // AI severity score (0-1)
     aiSeverityScore: {
       type: Number,
       min: 0,
-      max: 10,
+      max: 1,
       default: null,
     },
     // Cloudinary image URL

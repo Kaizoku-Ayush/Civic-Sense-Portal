@@ -1,2 +1,2 @@
 // Issue-related components
-// Examples: IssueCard, IssueForm, IssueList, IssueDetail
+export { default as IssueCard } from './IssueCard';

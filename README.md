@@ -25,12 +25,12 @@ An innovative platform that leverages Deep Neural Networks and AI to help citize
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 18 + Vite, Tailwind CSS, Leaflet.js |
-| **Backend** | Node.js + Express, PostgreSQL + PostGIS |
-| **AI Service** | Python FastAPI, TensorFlow, MobileNetV2 |
+| **Backend** | Node.js + Express, MongoDB + Mongoose |
+| **AI Service** | Python FastAPI, TensorFlow/Keras, MobileNetV2 + Groq LLaMA-4 Scout |
 | **Real-time** | Socket.io |
 | **Auth** | Firebase Auth |
 | **Storage** | Cloudinary |
-| **Deployment** | Vercel (Frontend), Railway (Backend) |
+| **Deployment** | Vercel (Frontend), Render/Railway (Backend + AI) |
 
 ## 📂 Project Structure
 
@@ -93,32 +93,35 @@ civic-sense-portal/
    npm run dev
    ```
 
-4. **Setup AI Service** (Optional for Day 1)
+4. **Setup AI Service**
    ```bash
    cd ai-service
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   source venv/bin/activate  # macOS/Linux
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   source .venv/bin/activate  # macOS/Linux
    pip install -r requirements.txt
-   uvicorn app.main:app --reload
+   uvicorn app.main:app --reload --port 8000
    ```
 
 5. **Setup Database**
-   ```bash
-   psql -U postgres
-   CREATE DATABASE civic_sense;
-   \c civic_sense
-   CREATE EXTENSION postgis;
-   ```
+   - Create a free M0 cluster at https://cloud.mongodb.com/
+   - Whitelist your IP and create a DB user
+   - Copy the connection string to `server/.env` as `MONGODB_URI`
+   - Collections and indexes are created automatically on first run
 
 ## 📖 Development Roadmap
 
-This project follows a 4-week development plan:
+This project follows a **7-day final sprint** (Mar 6–12, 2026):
 
-- **Week 1**: Foundation (Database, Auth, AI Model Training)
-- **Week 2**: Core Features (Issue Submission, Map Dashboard)
-- **Week 3**: Admin Portal (Management, Routing, Notifications)
-- **Week 4**: Analytics & Launch (Charts, PWA, Deployment)
+| Day | Focus | Status |
+|-----|-------|--------|
+| Day 1 | FastAPI AI Microservice | ✅ Done |
+| Day 2 | Backend Issues API | ✅ Done |
+| Day 3 | Frontend Core | ✅ Done |
+| Day 4 | Admin Portal + Real-time | ✅ Done |
+| Day 5 | PWA + Polish | 🔲 |
+| Day 6 | Deploy Everything | 🔲 |
+| Day 7 | Demo Prep | 🔲 |
 
 See [ROADMAP.md](ROADMAP.md) for detailed day-by-day tasks.
 
@@ -132,14 +135,14 @@ Local governments face challenges in identifying and resolving civic issues. Thi
 ## 📊 AI/ML Features
 
 ### 1. Image Classification
-- **Model**: MobileNetV2 with transfer learning
-- **Classes**: Pothole, Road Crack, Garbage, Streetlight, Drainage, Graffiti
-- **Accuracy Target**: >85%
+- **Model**: MobileNetV2 with transfer learning (Phase 1 + fine-tuned Phase 2)
+- **Classes**: Pothole, Road Damage, Garbage
+- **Achieved Accuracy**: 86.04%+ on validation set
 
-### 2. Severity Scoring
-- **Input**: Image + Category
-- **Output**: Urgency score (1-10)
-- **Use**: Prioritization automation
+### 2. AI Description (Groq LLaMA-4 Scout)
+- **Input**: Image + DNN category
+- **Output**: Natural language description + severity reason + recommendation
+- **Use**: Human-readable issue reports generated automatically
 
 ### 3. Duplicate Detection
 - **Method**: Perceptual hashing + Geolocation

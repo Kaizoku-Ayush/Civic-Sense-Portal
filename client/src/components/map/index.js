@@ -1,2 +1,2 @@
 // Map-related components
-// Examples: MapView, Marker, Heatmap, LocationPicker
+export { default as LocationPicker } from './LocationPicker';

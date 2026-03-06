@@ -17,11 +17,14 @@ albumentations>=1.4
 # Hashing (duplicate detection)
 imagehash>=4.3
 
-# FastAPI service (Day 6+)
+# FastAPI service
 fastapi>=0.111
 uvicorn[standard]>=0.30
 python-multipart>=0.0.9
 pydantic>=2.7
+
+# Groq vision API (free tier — LLaMA-4 Scout with vision)
+groq>=0.11
 
 # Cloudinary SDK (for production image fetching)
 cloudinary>=1.40

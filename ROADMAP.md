@@ -1,637 +1,259 @@
-# CIVIC SENSE PORTAL - COMPLETE PROJECT ROADMAP
+# CIVIC SENSE PORTAL - PROJECT ROADMAP
 ## AI-Powered Crowdsourced Civic Issue Reporting System
 
 | Property | Value |
 |----------|-------|
 | Project Type | Web Application (Progressive Web App - PWA) |
-| Duration | 4 Weeks |
-| Start Date | February 2, 2026 |
-| End Date | March 1, 2026 |
+| Problem Statement | #25031 — Crowdsourced Civic Issue Reporting and Resolution System |
+| Original Timeline | 4 Weeks (Feb 2 – Mar 1, 2026) |
+| **Revised Sprint** | **7 Days (Mar 6 – Mar 12, 2026)** |
+| **Submission Deadline** | **March 13, 2026** |
+| **Status** | 🔴 CRUNCH MODE — 7-day final sprint |
 
 ---
 
 ## TECH STACK
 
 ### FRONTEND
-- React.js 18+ (Vite for fast builds)
-- Tailwind CSS (styling)
-- Leaflet.js (interactive maps)
-- PWA features (service worker, manifest)
-- Axios (API calls)
-- React Query (data fetching/caching)
+- React.js 18 + Vite
+- Tailwind CSS
+- Leaflet.js + react-leaflet (interactive maps)
+- PWA (vite-plugin-pwa — manifest + service worker)
+- Axios + TanStack React Query
+- Socket.io-client (real-time updates)
+- Firebase Auth (client SDK)
 
 ### BACKEND
 - Node.js + Express.js
-- MongoDB + Mongoose (with 2dsphere indexes for geospatial queries)
-- Socket.io (real-time updates)
-- Multer (file uploads)
-- JWT (authentication)
+- MongoDB + Mongoose (2dsphere indexes for geospatial)
+- Socket.io (real-time events)
+- Multer + Cloudinary (image uploads)
+- Firebase Admin SDK (token verification)
 
 ### AI/ML MICROSERVICE
-- Python 3.10+
-- FastAPI (REST API for AI)
-- TensorFlow/Keras (image classification)
-- MobileNetV2 (pre-trained base model)
-- OpenCV (image preprocessing)
-- ImageHash (duplicate detection)
+- Python 3.10 + FastAPI + Uvicorn
+- TensorFlow/Keras — MobileNetV2 classifier (86%+ accuracy)
+- **Groq LLaMA-4 Scout Vision** — natural language issue description (free tier)
+- OpenCV + ImageHash (preprocessing + duplicate detection)
+- TFLite (float32 + float16) for edge deployment
 
-### CLOUD SERVICES (FREE TIER)
+### CLOUD / FREE TIER
 - Firebase Auth (authentication)
-- Cloudinary (image storage - 25GB free)
-- Railway/Render (backend hosting)
-- Vercel (frontend hosting)
-- Hugging Face Spaces (AI model hosting - optional)
+- Cloudinary (image storage — 25 GB free)
+- MongoDB Atlas (M0 free cluster)
+- Render or Railway (backend + AI service hosting)
+- Vercel (frontend)
 
 ---
 
-## DATASETS TO USE
+## ✅ WHAT'S ALREADY DONE (Feb 2 – Mar 6)
 
-### DATASET 1: RDD2022 (Road Damage Dataset)
+| Item | Status | Details |
+|------|--------|---------|
+| Project scaffold | ✅ | `client/`, `server/`, `ai-service/`, `docs/` |
+| React app (Vite 6, React 18) | ✅ | Auth pages, routing, Tailwind |
+| Firebase Auth (client + server) | ✅ | Login, Register, Google, middleware |
+| MongoDB schemas | ✅ | User, Issue, Department, IssueUpdate |
+| Dataset preparation | ✅ | 6 786 images, 3 classes, 70/15/15 split |
+| AI training Phase 1 | ✅ | MobileNetV2 frozen backbone — 86.04% val_acc |
+| AI training Phase 2 | ✅ | Fine-tuned top-30 layers, TFLite exports |
+| FastAPI AI service | ✅ | `/predict` — DNN + Groq vision combo, `/health`, `/classes` |
+| Dockerfile (AI service) | ✅ | `ai-service/Dockerfile` |
+| Backend Issues API | ✅ | POST/GET/PATCH issues, Cloudinary upload, AI integration, duplicate detection, Socket.io |
+| Frontend Core | ✅ | IssueSubmit, IssueList, IssueDetail, MapDashboard, MyReports, Navbar, StatusBadge, LocationPicker |
+| Admin Portal + Real-time | ✅ | AdminDashboard, DeptDashboard, /api/admin/stats, bulk update, dept Socket.io rooms |
 
-| Attribute | Details |
-|-----------|---------|
-| **Purpose** | Pothole and road damage classification |
-| **Size** | 47,000+ images |
-| **Format** | PASCAL VOC / COCO |
-| **Classes** | D00 (Longitudinal Crack), D10 (Transverse Crack), D20 (Alligator Crack), D40 (Pothole) |
-| **Download** | https://github.com/sekilab/RoadDamageDetector |
-| **License** | CC BY-SA 4.0 (Free for academic use) |
-| **Usage** | Sample 4000-5000 images for training |
+---
 
-### DATASET 2: TACO (Trash Annotations in Context)
+## 🚀 7-DAY FINAL SPRINT (Mar 6–12, 2026)
 
-| Attribute | Details |
-|-----------|---------|
-| **Purpose** | Garbage and litter detection |
-| **Size** | 15,000+ annotations on 1,500 images |
-| **Format** | COCO |
-| **Classes** | 60 categories (bottles, cans, bags, etc.) |
-| **Download** | http://tacodataset.org/ |
-| **License** | CC BY 4.0 (Free) |
-| **Usage** | Use all images, group into "garbage" super-category |
+### Priority framework
+- **Must-have** — judges will look for this, fail without it
+- **Should-have** — strong differentiator, do if time allows
+- **Nice-to-have** — polish only after core works
 
-### DATASET 3: Garbage Classification (Kaggle)
+---
 
-| Attribute | Details |
-|-----------|---------|
-| **Purpose** | Waste type classification |
-| **Size** | 15,000+ images |
-| **Format** | Folder-based (easy to use) |
-| **Classes** | cardboard, glass, metal, paper, plastic, trash |
-| **Download** | https://www.kaggle.com/datasets/asdasdasasdas/garbage-classification |
-| **License** | CC0 (Public Domain) |
-| **Usage** | Merge with TACO for robust garbage detection |
+### DAY 1 (Mar 6) — FastAPI AI Microservice ✅ DONE
 
-### COMBINED DATASET STRUCTURE
+| Task | Priority | Status |
+|------|----------|--------|
+| FastAPI app skeleton (`app/main.py`) | Must | ✅ |
+| `POST /predict` — DNN + severity formula | Must | ✅ |
+| Groq LLaMA-4 Scout vision analysis | Must | ✅ |
+| pHash duplicate detection | Must | ✅ |
+| `GET /health`, `GET /classes` | Must | ✅ |
+| Dockerfile | Must | ✅ |
+| `groq` SDK installed in venv | Must | ✅ |
 
+**AI pipeline per request:**
 ```
-civic_dataset/
-├── pothole/          (~2500 images from RDD2022 D40 class)
-├── road_crack/       (~2000 images from RDD2022 D00,D10,D20)
-├── garbage/          (~3000 images from TACO + Kaggle)
-├── streetlight/      (~300 images - manual collection needed)
-├── drainage/         (~300 images - manual collection needed)
-└── graffiti/         (~300 images - manual collection/scraping)
+Image → MobileNetV2 DNN → category + confidence + severity + pHash (~50 ms)
+                        ↓
+             Groq LLaMA-4 Scout → description + severity_reason + recommendation
+                        ↓
+             JSON response with both AI outputs
 ```
 
-**Total: ~8400 images** (sufficient for transfer learning)
+---
 
-> **NOTE:** For streetlight, drainage, graffiti - collect 50-100 real images and use data augmentation (rotation, flip, brightness) to reach 300.
+### DAY 2 (Mar 7) — Backend Issues API ✅ DONE
+
+**Goal:** Full CRUD for issues, Cloudinary upload, AI service integration, duplicate detection.
+
+| Task | Priority | Status |
+|------|----------|--------|
+| `POST /api/issues` — upload to Cloudinary → call AI service → save to MongoDB | Must | ✅ |
+| `GET /api/issues` — list with filters (category, status, lat/lng radius) | Must | ✅ |
+| `GET /api/issues/:id` — full issue detail | Must | ✅ |
+| `PATCH /api/issues/:id/status` — status transitions | Must | ✅ |
+| `POST /api/issues/:id/upvote` — citizen upvote | Should | ✅ |
+| Duplicate detection: hamming distance pHash < 10 + geo proximity < 50 m | Must | ✅ |
+| Auto-assign department by AI category (garbage→Sanitation, pothole/road→PublicWorks) | Must | ✅ |
+| `server/services/aiService.js` — axios client wrapping FastAPI | Must | ✅ |
+| `server/controllers/issueController.js` | Must | ✅ |
+| `server/routes/issues.js` | Must | ✅ |
+| Socket.io emit `issue:new` on creation | Should | ✅ |
+
+**Issue status flow:**
+```
+PENDING → ACKNOWLEDGED → IN_PROGRESS → RESOLVED
+                                     ↘ REJECTED
+```
 
 ---
 
-## 4-WEEK DETAILED ROADMAP
+### DAY 3 (Mar 8) — Frontend Core ✅ DONE
 
-### WEEK 1: FOUNDATION (Feb 2 - Feb 8, 2026)
+**Goal:** Issue submission form + Map + Issue list + Issue detail.
 
-#### DAY 1 (Feb 2) - Project Setup
+| Task | Priority | Status |
+|------|----------|--------|
+| `IssueSubmit` — image upload + camera capture | Must | ✅ |
+| AI preview card — DNN category/confidence + Groq description while user fills form | Must | ✅ |
+| Browser geolocation auto-fill + draggable Leaflet pin | Must | ✅ |
+| `POST /api/issues` submit with loading state | Must | ✅ |
+| `MapDashboard` — Leaflet map, clustered markers, category colour icons | Must | ✅ |
+| Marker popup with image thumbnail + status/severity badge | Must | ✅ |
+| `IssueList` — card grid, filter bar (category / status / sort) | Must | ✅ |
+| `IssueDetail` — image, AI analysis panel, status progress stepper, timeline | Must | ✅ |
+| `MyReports` — user's own submissions + stats strip | Should | ✅ |
+| Socket.io: new issue → map pin appears live | Should | ✅ |
+| `Navbar` — sticky responsive nav, avatar dropdown, mobile hamburger | Must | ✅ |
+| `StatusBadge`, `CategoryBadge`, `SeverityBar` reusable components | Must | ✅ |
 
-**Morning:**
-- [x] Create project folder structure
-- [x] Initialize React app with Vite: `npm create vite@latest client`
-- [x] Initialize Node.js backend: `npm init`
-- [x] Create MongoDB Atlas account (free M0 cluster at mongodb.com/atlas)
-- [x] Get MongoDB connection string
+**`client/src/pages/` delivered:**
+```
+IssueSubmit.jsx    ✅
+IssueList.jsx      ✅
+IssueDetail.jsx    ✅
+MapDashboard.jsx   ✅
+MyReports.jsx      ✅
+```
 
-**Afternoon:**
-- [x] Setup Git repository
-- [x] Create .gitignore, README.md
-- [x] Install core dependencies:
-  - Frontend: react-router-dom, axios, tailwindcss, leaflet
-  - Backend: express, mongoose, cors, dotenv, multer, jsonwebtoken
-
-**Evening:**
-- [x] Configure Tailwind CSS
-- [x] Create basic folder structure:
-  ```
-  client/src/components/
-  client/src/pages/
-  client/src/services/
-  server/routes/
-  server/controllers/
-  server/models/
-  ```
-
-#### DAY 2 (Feb 3) - Database & Auth
-
-**Morning:**
-- [x] Define Mongoose schemas (User, Issue, Department - see SCHEMA section)
-- [x] Create model files in `server/models/`
-- [x] Test MongoDB connection
-
-**Afternoon:**
-- [x] Setup Firebase Auth project
-- [x] Implement Firebase Auth in React
-- [x] Create Login/Register pages
-- [x] Create auth middleware for backend
-
-**Evening:**
-- [x] Test auth flow end-to-end
-- [x] Setup protected routes in React
-
-#### DAY 3 (Feb 4) - Prepare & Explore Datasets
-
-**Morning:**
-- [x] Explore pothole dataset: `dataset/potholes/Pothole_Segmentation_YOLOv8/`
-- [x] Explore road damage dataset: `dataset/road damage/India/`
-- [x] Explore garbage datasets: `dataset/garbage/TACO/` and `dataset/garbage/archive/`
-
-**Afternoon:**
-- [x] Write Python script to convert all datasets to a unified classification format
-- [x] Sample and balance classes across 3 categories (pothole, road_damage, garbage)
-- [x] Create train/validation/test splits (70/15/15)
-
-**Evening:**
-- [x] Verify unified dataset structure
-- [x] Calculate class distribution
-- [x] Plan augmentation strategy for smaller classes (pothole, road_damage)
-
-#### DAY 4 (Feb 5) - AI Model Training (Part 1)
-
-**Morning:**
-- [ ] Setup Python environment (venv)
-- [ ] Install TensorFlow, Keras, OpenCV, NumPy
-- [ ] Write data loading pipeline with ImageDataGenerator
-
-**Afternoon:**
-- [ ] Load MobileNetV2 pre-trained model
-- [ ] Add custom classification head (6 classes)
-- [ ] Configure transfer learning (freeze base layers)
-
-**Evening:**
-- [ ] Start training (10-15 epochs)
-- [ ] Monitor accuracy/loss curves
-- [ ] Save initial model checkpoint
-
-#### DAY 5 (Feb 6) - AI Model Training (Part 2)
-
-**Morning:**
-- [ ] Evaluate model on validation set
-- [ ] Fine-tune if needed (unfreeze top layers)
-- [ ] Apply data augmentation for low-accuracy classes
-
-**Afternoon:**
-- [ ] Train severity scoring model (regression head)
-- [ ] Test model on sample images
-- [ ] Export model to .h5 and TensorFlow SavedModel format
-
-**Evening:**
-- [ ] Convert to TFLite (optional, for mobile)
-- [ ] Document model performance metrics
-- [ ] Save final model files
-
-#### DAY 6 (Feb 7) - FastAPI AI Microservice
-
-**Morning:**
-- [ ] Setup FastAPI project structure
-- [ ] Create /predict endpoint
-- [ ] Load trained model in memory
-
-**Afternoon:**
-- [ ] Implement image preprocessing pipeline
-- [ ] Add severity scoring endpoint
-- [ ] Implement image hash generation for duplicates
-
-**Evening:**
-- [ ] Test all endpoints with Postman/Thunder Client
-- [ ] Add error handling
-- [ ] Write Dockerfile for AI service
-
-#### DAY 7 (Feb 8) - Integration & Week 1 Review
-
-**Morning:**
-- [ ] Connect React frontend to Node.js backend
-- [ ] Connect Node.js to FastAPI AI service
-- [ ] Test end-to-end image upload + classification
-
-**Afternoon:**
-- [ ] Fix any integration bugs
-- [ ] Optimize API response times
-- [ ] Setup environment variables properly
-
-**Evening:**
-- [ ] Week 1 code review and cleanup
-- [ ] Update documentation
-- [ ] Plan Week 2 tasks in detail
-
-**✓ WEEK 1 DELIVERABLES:**
-- Working auth system
-- Database setup with schema
-- Trained AI classification model (>85% accuracy target)
-- FastAPI microservice running locally
-- Basic React app structure
+**Bug fix:** `ProtectedRoute.jsx` pre-existing broken import (`'../hooks/useAuth'` → `'../../hooks/useAuth'`) — caused production build failure, now fixed.
 
 ---
 
-### WEEK 2: CORE FEATURES (Feb 9 - Feb 15, 2026)
+### DAY 4 (Mar 9) — Admin Portal + Real-time ✅ DONE
 
-#### DAY 8 (Feb 9) - Issue Submission Form
+**Goal:** Admin dashboard, role-based routing, department assignment, Socket.io.
 
-**Morning:**
-- [ ] Create IssueForm component
-- [ ] Implement image upload with preview
-- [ ] Add drag-and-drop support
+| Task | Priority | Status |
+|------|----------|--------|
+| `pages/admin/AdminDashboard.jsx` — issue table with filters | Must | ✅ |
+| Status update + department re-assignment from admin table | Must | ✅ |
+| Role guard — redirect non-admins | Must | ✅ |
+| `pages/department/DeptDashboard.jsx` — staff see only their queue | Must | ✅ |
+| Socket.io room per department — live queue updates | Should | ✅ |
+| `GET /api/admin/stats` — counts by status/category | Must | ✅ |
+| Basic analytics cards (total, pending, resolved, avg severity) | Must | ✅ |
+| `PATCH /api/admin/issues/:id` — bulk status + assign | Must | ✅ |
 
-**Afternoon:**
-- [ ] Integrate browser geolocation API
-- [ ] Create location picker map component
-- [ ] Add manual location adjustment option
-
-**Evening:**
-- [ ] Add form validation
-- [ ] Implement description textarea
-- [ ] Add category dropdown (manual override option)
-
-#### DAY 9 (Feb 10) - AI Integration in Frontend
-
-**Morning:**
-- [ ] Call AI service on image upload
-- [ ] Display predicted category with confidence
-- [ ] Show severity score visualization
-
-**Afternoon:**
-- [ ] Add "AI Suggestion" UI component
-- [ ] Allow user to confirm/change AI prediction
-- [ ] Show loading state during AI processing
-
-**Evening:**
-- [ ] Handle AI service errors gracefully
-- [ ] Add retry mechanism
-- [ ] Test with various image types
-
-#### DAY 10 (Feb 11) - Issue Submission Backend
-
-**Morning:**
-- [ ] Create POST /api/issues endpoint
-- [ ] Implement Cloudinary image upload
-- [ ] Save issue to database
-
-**Afternoon:**
-- [ ] Implement duplicate detection logic:
-  - Check image hash similarity (hamming distance < 10)
-  - Check geographic proximity (< 50 meters)
-  - Return warning if potential duplicate found
-
-**Evening:**
-- [ ] Add issue status workflow (PENDING → ACKNOWLEDGED → IN_PROGRESS → RESOLVED)
-- [ ] Create issue update endpoint
-- [ ] Test full submission flow
-
-#### DAY 11 (Feb 12) - Interactive Map Dashboard
-
-**Morning:**
-- [ ] Setup Leaflet.js in React
-- [ ] Create MapView component
-- [ ] Display all issues as markers
-
-**Afternoon:**
-- [ ] Implement marker clustering for dense areas
-- [ ] Add custom marker icons per category
-- [ ] Create marker popup with issue details
-
-**Evening:**
-- [ ] Add map filters (by category, status, date)
-- [ ] Implement "locate me" button
-- [ ] Add heatmap layer option
-
-#### DAY 12 (Feb 13) - Issue List & Details
-
-**Morning:**
-- [ ] Create IssueList component with cards
-- [ ] Implement infinite scroll/pagination
-- [ ] Add sorting (newest, severity, distance)
-
-**Afternoon:**
-- [ ] Create IssueDetail page
-- [ ] Show full issue info, image, map
-- [ ] Display AI analysis results
-
-**Evening:**
-- [ ] Add status timeline component
-- [ ] Implement "My Reports" page for logged-in users
-- [ ] Add share functionality
-
-#### DAY 13 (Feb 14) - Real-time Updates
-
-**Morning:**
-- [ ] Setup Socket.io on backend
-- [ ] Implement connection handling
-- [ ] Create room-based subscriptions
-
-**Afternoon:**
-- [ ] Push new issue notifications to map
-- [ ] Update issue status in real-time
-- [ ] Add notification toast component
-
-**Evening:**
-- [ ] Implement "watching" feature for issues
-- [ ] Add browser push notifications (PWA)
-- [ ] Test real-time sync across tabs
-
-#### DAY 14 (Feb 15) - Week 2 Polish & Review
-
-**Morning:**
-- [ ] Code cleanup and refactoring
-- [ ] Fix UI/UX issues
-- [ ] Mobile responsiveness check
-
-**Afternoon:**
-- [ ] Performance optimization
-- [ ] Add loading skeletons
-- [ ] Implement error boundaries
-
-**Evening:**
-- [ ] Week 2 testing session
-- [ ] Document API endpoints
-- [ ] Plan admin portal features
-
-**✓ WEEK 2 DELIVERABLES:**
-- Complete issue submission with AI auto-classification
-- Interactive map with all issues
-- Issue list and detail views
-- Real-time updates
-- Mobile-responsive UI
+**Delivered:**
+- `GET /api/admin/stats` — total, pending, acknowledged, inProgress, resolved, rejected, byCategory, avgSeverity
+- `PATCH /api/admin/issues/:id` — full update with `IssueUpdate` timeline entry + socket emit
+- `POST /api/admin/issues/bulk` — bulk status/department change + `issues:bulk-updated` socket emit
+- `GET /api/issues/department` — dept staff queue endpoint (scoped to `req.user.departmentId`)
+- Socket.io `join-department` / `leave-department` room handlers in `app.js`
+- `AdminDashboard` — 6 stat cards, category breakdown, filter bar, bulk toolbar, inline row editor
+- `DeptDashboard` — status strip, filter tabs, card grid with AI snippet + one-tap status transitions
+- `Navbar` — "My Queue" link for `DEPARTMENT_STAFF` role
 
 ---
 
-### WEEK 3: ADMIN PORTAL (Feb 16 - Feb 22, 2026)
+### DAY 5 (Mar 10) — PWA + Polish
 
-#### DAY 15 (Feb 16) - Admin Authentication
+**Goal:** PWA installable, mobile-first pass, offline page.
 
-**Morning:**
-- [ ] Add user roles (CITIZEN, ADMIN, DEPARTMENT_STAFF)
-- [ ] Create admin login page
-- [ ] Implement role-based route protection
-
-**Afternoon:**
-- [ ] Create admin dashboard layout
-- [ ] Add sidebar navigation
-- [ ] Implement admin-only API middleware
-
-**Evening:**
-- [ ] Setup department user accounts
-- [ ] Create user management page (admin only)
-- [ ] Test role-based access
-
-#### DAY 16 (Feb 17) - Admin Issue Management
-
-**Morning:**
-- [ ] Create admin issue table view
-- [ ] Add advanced filters (status, category, date range, location)
-- [ ] Implement bulk selection
-
-**Afternoon:**
-- [ ] Add issue assignment functionality
-- [ ] Create department dropdown
-- [ ] Implement bulk status update
-
-**Evening:**
-- [ ] Add priority override option
-- [ ] Create issue notes/comments system
-- [ ] Implement internal communication thread
-
-#### DAY 17 (Feb 18) - Auto-Routing Engine
-
-**Morning:**
-- [ ] Define routing rules in database
-- [ ] Create routing_rules table
-- [ ] Map categories to departments
-
-**Afternoon:**
-- [ ] Implement auto-routing on issue creation
-- [ ] Add location-based routing (zones)
-- [ ] Create routing override option for admins
-
-**Evening:**
-- [ ] Test routing with various scenarios
-- [ ] Add routing history log
-- [ ] Create routing rules management UI
-
-#### DAY 18 (Feb 19) - Department Portal
-
-**Morning:**
-- [ ] Create department staff dashboard
-- [ ] Show only assigned issues
-- [ ] Add workload summary
-
-**Afternoon:**
-- [ ] Implement status update workflow
-- [ ] Add photo upload for resolution proof
-- [ ] Create resolution notes field
-
-**Evening:**
-- [ ] Add issue transfer between departments
-- [ ] Implement SLA warnings (issues pending > 48 hours)
-- [ ] Create department performance metrics
-
-#### DAY 19 (Feb 20) - Notifications System
-
-**Morning:**
-- [ ] Create notifications table
-- [ ] Implement in-app notifications
-- [ ] Add notification preferences
-
-**Afternoon:**
-- [ ] Setup email notifications (Nodemailer + Gmail/SendGrid)
-- [ ] Create email templates (confirmation, status update, resolution)
-- [ ] Add email queue for batch sending
-
-**Evening:**
-- [ ] Implement PWA push notifications
-- [ ] Add notification center UI
-- [ ] Test all notification channels
-
-#### DAY 20 (Feb 21) - Duplicate Management
-
-**Morning:**
-- [ ] Create duplicate detection dashboard
-- [ ] Show potential duplicate pairs
-- [ ] Add merge functionality
-
-**Afternoon:**
-- [ ] Implement master/duplicate relationship
-- [ ] Auto-notify users of merged reports
-- [ ] Add manual duplicate marking
-
-**Evening:**
-- [ ] Create duplicate report view
-- [ ] Add "related issues" section
-- [ ] Test duplicate clustering
-
-#### DAY 21 (Feb 22) - Week 3 Review
-
-**Morning:**
-- [ ] Full admin portal testing
-- [ ] Fix critical bugs
-- [ ] Security audit (SQL injection, XSS)
-
-**Afternoon:**
-- [ ] Performance testing with mock data
-- [ ] Load testing with Artillery/k6
-- [ ] Optimize slow queries
-
-**Evening:**
-- [ ] Documentation update
-- [ ] Create admin user guide
-- [ ] Plan analytics features
-
-**✓ WEEK 3 DELIVERABLES:**
-- Complete admin portal
-- Auto-routing engine
-- Department staff portal
-- Notification system (email + push)
-- Duplicate detection and management
+| Task | Priority |
+|------|----------|
+| Install `vite-plugin-pwa`, configure `manifest.json` | Must |
+| App icons (192×192, 512×512 PNG) | Must |
+| Service worker — cache shell, offline fallback page | Must |
+| Lighthouse PWA audit ≥ 90 | Must |
+| Mobile responsive pass — all pages | Must |
+| Loading skeletons on issue list + map | Should |
+| Toast notifications (issue submitted, status changed) | Should |
+| Error boundaries on major pages | Should |
+| `env.example` files complete, SETUP.md updated | Must |
 
 ---
 
-### WEEK 4: ANALYTICS & LAUNCH (Feb 23 - Mar 1, 2026)
+### DAY 6 (Mar 11) — Deploy Everything
 
-#### DAY 22 (Feb 23) - Analytics Dashboard
+**Goal:** Three live URLs — frontend, backend, AI service.
 
-**Morning:**
-- [ ] Create analytics page layout
-- [ ] Implement issues over time chart (Line chart)
-- [ ] Add category distribution (Pie chart)
+| Task | Priority | Service |
+|------|----------|---------|
+| MongoDB Atlas — create production cluster | Must | Atlas |
+| Deploy AI service (FastAPI) | Must | Render / Railway |
+| Set `GROQ_API_KEY` env on AI service host | Must | Render env vars |
+| Deploy Node.js backend | Must | Render / Railway |
+| Deploy React frontend | Must | Vercel |
+| Configure CORS on backend for Vercel domain | Must | — |
+| Configure `VITE_API_URL` + `VITE_AI_URL` env vars on Vercel | Must | — |
+| End-to-end smoke test on production | Must | — |
+| Seed 5–10 realistic issues with real images | Must | — |
 
-**Afternoon:**
-- [ ] Create resolution time metrics
-- [ ] Add department performance comparison
-- [ ] Implement trend analysis
+---
 
-**Evening:**
-- [ ] Add date range selector
-- [ ] Create exportable reports (CSV/PDF)
-- [ ] Add key metrics cards (total issues, avg resolution time, etc.)
+### DAY 7 (Mar 12) — Demo Prep
 
-#### DAY 23 (Feb 24) - Heatmap & Hotspots
+**Goal:** Polished, submittable project.
 
-**Morning:**
-- [ ] Implement issue density heatmap
-- [ ] Add temporal heatmap (issues by hour/day)
-- [ ] Create hotspot detection algorithm
+| Task | Priority |
+|------|----------|
+| Record 3–5 min demo video: citizen submits issue → AI classifies + Groq describes → admin resolves | Must |
+| Presentation slides (problem → solution → AI pipeline → live demo → impact) | Must |
+| Update README with architecture diagram, setup instructions, live URLs | Must |
+| Final PROGRESS.md update with all metrics | Must |
+| Make sure train_phase2.ipynb has all cells run with output | Must |
+| Backup: push everything to GitHub | Must |
 
-**Afternoon:**
-- [ ] Add predictive hotspot highlighting
-- [ ] Create "problem areas" report
-- [ ] Implement zone-based analytics
+---
 
-**Evening:**
-- [ ] Add comparison view (this month vs last month)
-- [ ] Create ward/area-wise breakdown
-- [ ] Test analytics accuracy
+## DEMO SCRIPT (for Day 7)
 
-#### DAY 24 (Feb 25) - Public Transparency Dashboard
+1. Open app on mobile (PWA) — show "Add to Home Screen"
+2. Citizen submits a pothole photo → AI instantly shows: *"Pothole detected (94% confidence), Severity 0.99 — Large pothole posing immediate vehicle damage risk. Dispatch road crew within 24h."*
+3. Map dashboard — marker appears live (Socket.io)
+4. Admin portal — assigns to Public Works dept, changes status to IN_PROGRESS
+5. Show analytics cards: total issues, avg severity, resolution rate
+6. Show Lighthouse PWA score ≥ 90
 
-**Morning:**
-- [ ] Create public analytics page (no login required)
-- [ ] Show city-wide statistics
-- [ ] Add leaderboard (most active citizens)
+---
 
-**Afternoon:**
-- [ ] Implement "Before/After" gallery
-- [ ] Add government response time transparency
-- [ ] Create monthly report generator
+## DROPPED FROM SCOPE (time constraint)
 
-**Evening:**
-- [ ] Add social sharing for resolved issues
-- [ ] Create embeddable widgets
-- [ ] Add API documentation for integrations
-
-#### DAY 25 (Feb 26) - PWA Features
-
-**Morning:**
-- [ ] Create manifest.json
-- [ ] Add app icons (all sizes)
-- [ ] Configure service worker
-
-**Afternoon:**
-- [ ] Implement offline mode
-- [ ] Add offline issue queue
-- [ ] Sync queued issues when online
-
-**Evening:**
-- [ ] Add "Add to Home Screen" prompt
-- [ ] Test PWA on mobile devices
-- [ ] Verify PWA audit score (Lighthouse)
-
-#### DAY 26 (Feb 27) - Testing & Bug Fixes
-
-**Morning:**
-- [ ] Full application testing
-- [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
-- [ ] Mobile device testing
-
-**Afternoon:**
-- [ ] Fix critical bugs
-- [ ] Performance optimization
-- [ ] Security hardening
-
-**Evening:**
-- [ ] User acceptance testing
-- [ ] Get feedback from test users
-- [ ] Prioritize final fixes
-
-#### DAY 27 (Feb 28) - Deployment
-
-**Morning:**
-- [ ] Deploy MongoDB Atlas cluster (free M0 tier at mongodb.com/atlas)
-- [ ] Deploy Node.js backend to Railway/Render
-- [ ] Deploy FastAPI to Railway/Hugging Face Spaces
-
-**Afternoon:**
-- [ ] Deploy React frontend to Vercel
-- [ ] Configure custom domain (optional)
-- [ ] Setup environment variables in production
-
-**Evening:**
-- [ ] Full production testing
-- [ ] Monitor error logs
-- [ ] Fix any deployment issues
-
-#### DAY 28 (Mar 1) - Documentation & Demo
-
-**Morning:**
-- [ ] Create demo video (5-7 minutes)
-- [ ] Prepare presentation slides
-- [ ] Write project documentation
-
-**Afternoon:**
-- [ ] Create user guide
-- [ ] Document API endpoints
-- [ ] Prepare Q&A for judges
-
-**Evening:**
-- [ ] Final review
-- [ ] Backup all code and data
-- [ ] **CELEBRATE! 🎉**
-
-**✓ WEEK 4 DELIVERABLES:**
-- Analytics dashboard with charts
-- Heatmap and hotspot analysis
-- Public transparency dashboard
-- Full PWA functionality
-- Production deployment
-- Demo video and documentation
+| Feature | Reason |
+|---------|--------|
+| Separate severity regression model (train_phase2.ipynb section 11) | Analytic formula gives identical UX; saves hours of training time |
+| Email notifications (Nodemailer) | Complex, not visible in demo |
+| Heatmap layer | Nice-to-have, no time |
+| Public transparency dashboard | Admin dashboard covers this for judges |
+| Load testing (Artillery/k6) | Not needed for demo |
+| Offline issue queue (IndexedDB sync) | Service worker cache covers offline UX |
 
 ---
 

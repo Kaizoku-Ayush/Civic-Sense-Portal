@@ -1,6 +1,8 @@
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { Server as SocketIO } from 'socket.io';
 import connectDB from './config/db.js';
 import routes from './routes/index.js';
 
@@ -10,6 +12,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // CORS config
@@ -18,6 +21,34 @@ const allowedOrigins = process.env.FRONTEND_URL
   : ['http://localhost:3000', 'http://localhost:5173'];
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+// Socket.io — attached to the same HTTP server
+export const io = new SocketIO(httpServer, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+
+  // Department staff join their department room for live queue updates
+  socket.on('join-department', (deptId) => {
+    if (deptId) {
+      socket.join(`dept:${deptId}`);
+      console.log(`Socket ${socket.id} joined dept:${deptId}`);
+    }
+  });
+
+  socket.on('leave-department', (deptId) => {
+    if (deptId) socket.leave(`dept:${deptId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -40,8 +71,9 @@ app.get('/api', (req, res) => {
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
-      issues: '/api/issues (coming soon)',
-      departments: '/api/departments (coming soon)'
+      issues: '/api/issues',
+      admin: '/api/admin',
+      analytics: '/api/analytics',
     }
   });
 });
@@ -63,7 +95,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 API available at http://localhost:${PORT}/api`);
 });
