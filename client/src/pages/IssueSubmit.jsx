@@ -5,6 +5,7 @@ import api from '../services/api';
 import LocationPicker from '../components/map/LocationPicker';
 import { CategoryBadge, SeverityBar } from '../components/common/StatusBadge';
 import Navbar from '../components/common/Navbar';
+import { useToast } from '../context/ToastContext';
 
 const CATEGORIES = [
   { value: 'pothole',     label: 'Pothole',     icon: '🕳️' },
@@ -15,6 +16,7 @@ const CATEGORIES = [
 
 const IssueSubmit = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -80,7 +82,7 @@ const IssueSubmit = () => {
   // ── Geolocation ──────────────────────────────────────────────────────
   const detectLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      addToast('Geolocation is not supported by your browser.', 'error');
       return;
     }
     setGeoLoading(true);
@@ -89,9 +91,10 @@ const IssueSubmit = () => {
         setLat(pos.coords.latitude);
         setLng(pos.coords.longitude);
         setGeoLoading(false);
+        addToast('Location detected successfully!', 'success', 2500);
       },
       (err) => {
-        alert('Could not detect location: ' + err.message);
+        addToast('Could not detect location: ' + err.message, 'error');
         setGeoLoading(false);
       },
       { timeout: 10000 }
@@ -121,9 +124,12 @@ const IssueSubmit = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
+      addToast('Issue submitted successfully! 🎉', 'success');
       navigate(`/issues/${res.data._id}`, { state: { fresh: true } });
     } catch (err) {
-      setSubmitError(err.response?.data?.error || 'Failed to submit issue. Please try again.');
+      const msg = err.response?.data?.error || 'Failed to submit issue. Please try again.';
+      setSubmitError(msg);
+      addToast(msg, 'error');
       setSubmitting(false);
     }
   };

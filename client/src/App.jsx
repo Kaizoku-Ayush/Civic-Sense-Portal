@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,8 +18,10 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <ToastProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -101,9 +105,11 @@ function App() {
               </div>
             }
           />
-        </Routes>
-      </AuthProvider>
-    </Router>
+          </Routes>
+          </ToastProvider>
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

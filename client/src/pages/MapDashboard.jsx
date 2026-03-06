@@ -141,7 +141,20 @@ const MapDashboard = () => {
       </div>
 
       {/* Map */}
-      <div className="flex-1" style={{ minHeight: 'calc(100vh - 120px)' }}>
+      <div className="flex-1 relative" style={{ minHeight: 'calc(100vh - 120px)' }}>
+        {/* Loading skeleton overlay */}
+        {loading && (
+          <div className="absolute inset-0 z-[999] bg-gray-100 flex flex-col items-center justify-center gap-4">
+            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+            <p className="text-sm text-gray-500 font-medium">Loading map data…</p>
+            {/* Skeleton grid to simulate map tiles */}
+            <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-0.5 opacity-30 pointer-events-none">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div key={i} className="bg-gray-200 animate-pulse" style={{ animationDelay: `${(i % 6) * 100}ms` }} />
+              ))}
+            </div>
+          </div>
+        )}
         <MapContainer
           center={[20.5937, 78.9629]}
           zoom={5}

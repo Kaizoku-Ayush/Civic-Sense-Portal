@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { StatusBadge, CategoryBadge, PriorityBadge, SeverityBar } from '../components/common/StatusBadge';
 import Navbar from '../components/common/Navbar';
+import { useToast } from '../context/ToastContext';
 
 const STATUS_STEPS = ['PENDING', 'ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED'];
 
@@ -11,6 +12,7 @@ const IssueDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const location = useLocation();
+  const { addToast } = useToast();
 
   const [issue, setIssue] = useState(null);
   const [updates, setUpdates] = useState([]);
@@ -46,8 +48,9 @@ const IssueDetail = () => {
     try {
       const { data } = await api.post(`/issues/${id}/upvote`);
       setIssue((prev) => ({ ...prev, upvotes: data.upvotes ?? (prev.upvotes || 0) + 1 }));
+      addToast('Upvote recorded!', 'success', 2500);
     } catch {
-      // silently ignore
+      addToast('Could not upvote. Please try again.', 'error');
     } finally {
       setUpvoting(false);
     }

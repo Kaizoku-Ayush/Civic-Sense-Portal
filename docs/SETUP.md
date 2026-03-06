@@ -77,8 +77,31 @@ The Vite dev server proxies `/ai/*` → `http://localhost:8000` automatically �
 
 ## Environment Variables Reference
 
-See `client/.env.example` and `server/.env.example` for the full list
+See `client/.env.example`, `server/.env.example`, and `ai-service/.env.example` for the full list
 of required variables with descriptions.
+
+## PWA (Progressive Web App)
+
+The app is PWA-ready out of the box. Service worker and manifest are generated automatically during build.
+
+### Testing PWA locally
+
+```bash
+# Build first — service worker is NOT active in dev mode
+cd client
+npm run build
+npm run preview      # serves the built output at http://localhost:4173
+```
+
+Open Chrome DevTools → **Application** tab → **Service Workers** to verify registration.  
+Run **Lighthouse** → **Progressive Web App** to audit the score (target: ≥ 90).
+
+### "Add to Home Screen"
+
+- **Android (Chrome):** Visit the preview URL → three-dot menu → **Add to Home screen**
+- **iOS (Safari):** Visit the preview URL → Share → **Add to Home Screen**
+
+Icons live in `client/public/icons/`. The service worker caches the app shell and OpenStreetMap tiles for offline map browsing.
 
 ## Troubleshooting
 

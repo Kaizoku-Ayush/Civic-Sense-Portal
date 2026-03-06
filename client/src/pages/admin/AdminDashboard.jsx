@@ -4,6 +4,7 @@ import Navbar from '../../components/common/Navbar';
 import { StatusBadge, PriorityBadge, CategoryBadge } from '../../components/common/StatusBadge';
 import api from '../../services/api';
 import { connectSocket, disconnectSocket } from '../../services/socket';
+import { useToast } from '../../context/ToastContext';
 
 const STATUSES = ['PENDING', 'ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'DUPLICATE'];
 const CATEGORIES = ['pothole', 'road_damage', 'garbage', 'other'];
@@ -167,6 +168,7 @@ function IssueRow({ issue, departments, onUpdate, selected, onToggle }) {
 
 // ── Main AdminDashboard ──────────────────────────────────────────────────────
 export default function AdminDashboard() {
+  const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [issues, setIssues] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -265,18 +267,28 @@ export default function AdminDashboard() {
 
   // ── Issue update handler ───────────────────────────────────────────────────
   async function handleUpdate(id, updates) {
-    await api.patch(`/admin/issues/${id}`, updates);
-    await Promise.all([fetchIssues(page), fetchStats()]);
+    try {
+      await api.patch(`/admin/issues/${id}`, updates);
+      await Promise.all([fetchIssues(page), fetchStats()]);
+      addToast('Issue updated successfully.', 'success');
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to update issue.', 'error');
+      throw err;
+    }
   }
 
-  // ── Bulk update ────────────────────────────────────────────────────────────
+  // ── Bulk update ────────────────────────────────────────────
   async function handleBulkUpdate() {
     if (selected.size === 0 || (!bulkStatus && !bulkDept)) return;
     const payload = { ids: [...selected] };
     if (bulkStatus) payload.status = bulkStatus;
     if (bulkDept) payload.assignedDepartment = bulkDept;
-
-    await api.post('/admin/issues/bulk', payload);
+    try {
+      await api.post('/admin/issues/bulk', payload);
+      addToast(`${selected.size} issue(s) updated.`, 'success');
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Bulk update failed.', 'error');
+    }
     setBulkStatus('');
     setBulkDept('');
     await Promise.all([fetchIssues(page), fetchStats()]);

@@ -5,6 +5,7 @@ import { StatusBadge, PriorityBadge, CategoryBadge } from '../../components/comm
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 import { connectSocket } from '../../services/socket';
+import { useToast } from '../../context/ToastContext';
 
 const VALID_TRANSITIONS = {
   PENDING:      ['ACKNOWLEDGED', 'REJECTED'],
@@ -53,7 +54,7 @@ function StatusStrip({ issues }) {
 }
 
 // ── Queue issue card ─────────────────────────────────────────────────────────
-function QueueCard({ issue, onStatusChange }) {
+function QueueCard({ issue, onStatusChange, onToast }) {
   const [saving, setSaving] = useState(false);
   const transitions = VALID_TRANSITIONS[issue.status] || [];
 
@@ -64,8 +65,10 @@ function QueueCard({ issue, onStatusChange }) {
         status: newStatus,
         comment: `Status updated by department staff`,
       });
+      onToast(`Issue marked as ${STATUS_LABELS[newStatus]}.`, 'success');
       onStatusChange();
     } catch (err) {
+      onToast(err.response?.data?.error || 'Status update failed.', 'error');
       console.error('Status update failed:', err);
     } finally {
       setSaving(false);
@@ -168,8 +171,7 @@ function QueueCard({ issue, onStatusChange }) {
 
 // ── Main DeptDashboard ───────────────────────────────────────────────────────
 export default function DeptDashboard() {
-  const { user } = useAuth();
-  const [issues, setIssues] = useState([]);
+  const { user } = useAuth();  const { addToast } = useToast();  const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
@@ -277,7 +279,7 @@ export default function DeptDashboard() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {issues.map((issue) => (
-                  <QueueCard key={issue._id} issue={issue} onStatusChange={fetchQueue} />
+                  <QueueCard key={issue._id} issue={issue} onStatusChange={fetchQueue} onToast={addToast} />
                 ))}
               </div>
             )}
