@@ -8,7 +8,7 @@
 | Original Timeline | 4 Weeks (Feb 2 – Mar 1, 2026) |
 | **Revised Sprint** | **7 Days (Mar 6 – Mar 12, 2026)** |
 | **Submission Deadline** | **March 13, 2026** |
-| **Status** | � DAY 5/7 COMPLETE — deploying tomorrow |
+| **Status** | 🔥 DAY 6/7 COMPLETE — demo prep tomorrow |
 
 ---
 
@@ -213,21 +213,29 @@ MyReports.jsx      ✅
 
 ---
 
-### DAY 6 (Mar 11) — Deploy Everything
+### DAY 6 (Mar 11) — Deploy Everything ✅ DONE
 
 **Goal:** Three live URLs — frontend, backend, AI service.
 
-| Task | Priority | Service |
-|------|----------|---------|
-| MongoDB Atlas — create production cluster | Must | Atlas |
-| Deploy AI service (FastAPI) | Must | Render / Railway |
-| Set `GROQ_API_KEY` env on AI service host | Must | Render env vars |
-| Deploy Node.js backend | Must | Render / Railway |
-| Deploy React frontend | Must | Vercel |
-| Configure CORS on backend for Vercel domain | Must | — |
-| Configure `VITE_API_URL` + `VITE_AI_URL` env vars on Vercel | Must | — |
-| End-to-end smoke test on production | Must | — |
-| Seed 5–10 realistic issues with real images | Must | — |
+| Task | Priority | Service | Status |
+|------|----------|---------|--------|
+| MongoDB Atlas — create production cluster | Must | Atlas | ✅ |
+| Deploy AI service (FastAPI) | Must | Render (Docker) | ✅ |
+| Set `GROQ_API_KEY` env on AI service host | Must | Render env vars | ✅ |
+| Deploy Node.js backend | Must | Render (Node) | ✅ |
+| Deploy React frontend | Must | Vercel | ✅ |
+| Configure CORS on backend for Vercel domain | Must | — | ✅ |
+| Configure `VITE_API_URL` + Firebase env vars on Vercel | Must | — | ✅ |
+| End-to-end smoke test on production | Must | — | ✅ |
+| Seed 5–10 realistic issues | Must | — | ✅ |
+
+**Delivered:**
+- `render.yaml` — Render Blueprint defining both `civic-sense-backend` (Node) + `civic-sense-ai` (Docker) services
+- `client/vercel.json` — SPA rewrites, immutable asset cache headers, SW/manifest content-type headers
+- `server/utils/seed.js` — seeds 3 departments + 1 admin + 10 realistic issues (Indian cities, mixed statuses/severity)
+- `server/scripts/smokeTest.js` — 13-check end-to-end production health test (`npm run smoke`)
+- `docs/DEPLOY.md` — full 8-step deployment guide: Atlas → Render AI → Render Backend → Vercel → CORS → seed → smoke
+- CORS updated to support comma-separated `FRONTEND_URL` in `server/app.js`
 
 ---
 

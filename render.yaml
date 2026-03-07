@@ -1,0 +1,65 @@
+##############################################################################
+# render.yaml — Civic Sense Portal
+# Deploys two services on Render (free tier):
+#   1. civic-sense-backend   → Node.js Express API
+#   2. civic-sense-ai        → Python FastAPI AI microservice
+#
+# Deploy: https://dashboard.render.com → New → Blueprint → point to this repo
+##############################################################################
+
+services:
+
+  # ─── 1. Node.js Backend ───────────────────────────────────────────────────
+  - type: web
+    name: civic-sense-backend
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node app.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false          # set manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Render auto-generates a secure random value
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false          # paste the JSON string from Firebase console
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: AI_SERVICE_URL
+        sync: false          # set after AI service is deployed, e.g. https://civic-sense-ai.onrender.com
+      - key: FRONTEND_URL
+        sync: false          # set after Vercel deploy, e.g. https://civic-sense.vercel.app
+      - key: SKIP_FIREBASE_AUTH
+        value: false
+
+  # ─── 2. Python FastAPI AI Service ─────────────────────────────────────────
+  - type: web
+    name: civic-sense-ai
+    runtime: docker
+    region: oregon
+    plan: free
+    rootDir: ai-service
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # get free key at https://console.groq.com
+      - key: GROQ_MODEL
+        value: meta-llama/llama-4-scout-17b-16e-instruct
+      - key: PORT
+        value: 8000
+      - key: ENV
+        value: production
