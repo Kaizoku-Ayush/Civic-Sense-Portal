@@ -77,27 +77,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Day 3 Completion Notice */}
-        <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
-          <div className="flex items-start">
-            <svg className="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h3 className="text-lg font-semibold text-green-900">Day 3 Complete! 🎉</h3>
-              <p className="mt-2 text-sm text-green-800">
-                Frontend core is live — issue submission, map dashboard, issue list, and detail pages are all wired up!
-              </p>
-              <ul className="mt-3 text-sm text-green-700 space-y-1">
-                <li>✅ IssueSubmit — camera/upload + AI preview + location picker</li>
-                <li>✅ IssueList — card grid with category/status/sort filters</li>
-                <li>✅ IssueDetail — AI analysis panel + status timeline</li>
-                <li>✅ MapDashboard — Leaflet map + clustered markers + Socket.io live pins</li>
-                <li>✅ MyReports — personal submission tracker</li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );
