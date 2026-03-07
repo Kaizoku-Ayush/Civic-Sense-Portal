@@ -101,7 +101,7 @@ const MapDashboard = () => {
   const CATEGORIES = ['all', 'pothole', 'road_damage', 'garbage', 'other'];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="h-screen bg-gray-900 flex flex-col overflow-hidden">
       <Navbar />
 
       {/* Controls bar */}
@@ -141,7 +141,7 @@ const MapDashboard = () => {
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative" style={{ minHeight: 'calc(100vh - 120px)' }}>
+      <div className="flex-1 relative" style={{ minHeight: 0 }}>
         {/* Loading skeleton overlay */}
         {loading && (
           <div className="absolute inset-0 z-[999] bg-gray-100 flex flex-col items-center justify-center gap-4">
@@ -158,7 +158,7 @@ const MapDashboard = () => {
         <MapContainer
           center={[20.5937, 78.9629]}
           zoom={5}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: '100%', width: '100%', minHeight: '400px' }}
           scrollWheelZoom
         >
           <TileLayer
