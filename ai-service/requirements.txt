@@ -1,6 +1,7 @@
-# Core ML stack — let pip resolve keras to whichever version tensorflow needs;
-# cross-version Dense compat is handled in predictor.py via custom_objects.
+# Core ML stack — exact versions must match training environment.
+# keras 3.13.x requires Python >=3.11 (see Dockerfile).
 tensorflow==2.20.0
+keras==3.13.2
 numpy>=2.0
 
 # Image processing

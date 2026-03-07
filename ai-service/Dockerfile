@@ -1,5 +1,6 @@
 # ── Stage 1: base image ───────────────────────────────────────────────────────
-FROM python:3.10-slim
+# Python 3.11+ is required by keras>=3.13 (which matches the training env).
+FROM python:3.11-slim
 
 # System deps for OpenCV headless
 RUN apt-get update && apt-get install -y --no-install-recommends \
