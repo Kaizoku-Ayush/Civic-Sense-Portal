@@ -55,8 +55,11 @@ io.on('connection', (socket) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Root — redirect browsers to /api so visiting the naked URL isn't confusing
+app.get('/', (_req, res) => res.redirect('/api'));
+
 // Basic health check route
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ 
     status: 'ok', 
     message: 'Civic Sense Portal API is running',
@@ -65,7 +68,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
   res.json({ 
     message: 'Welcome to Civic Sense Portal API',
     version: '1.0.0',
