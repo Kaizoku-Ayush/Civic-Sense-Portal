@@ -8,7 +8,7 @@
 | Original Timeline | 4 Weeks (Feb 2 – Mar 1, 2026) |
 | **Revised Sprint** | **7 Days (Mar 6 – Mar 12, 2026)** |
 | **Submission Deadline** | **March 13, 2026** |
-| **Status** | 🔥 DAY 6/7 COMPLETE — demo prep tomorrow |
+| **Status** | 🔥 DAY 6/7 COMPLETE — all services live, 13/13 smoke test passing |
 
 ---
 
@@ -243,14 +243,14 @@ MyReports.jsx      ✅
 
 **Goal:** Polished, submittable project.
 
-| Task | Priority |
-|------|----------|
-| Record 3–5 min demo video: citizen submits issue → AI classifies + Groq describes → admin resolves | Must |
-| Presentation slides (problem → solution → AI pipeline → live demo → impact) | Must |
-| Update README with architecture diagram, setup instructions, live URLs | Must |
-| Final PROGRESS.md update with all metrics | Must |
-| Make sure train_phase2.ipynb has all cells run with output | Must |
-| Backup: push everything to GitHub | Must |
+| Task | Priority | Status |
+|------|----------|--------|
+| Record 3–5 min demo video: citizen submits issue → AI classifies + Groq describes → admin resolves | Must | ⬜ |
+| Presentation slides (problem → solution → AI pipeline → live demo → impact) | Must | ⬜ |
+| Update README with architecture diagram, setup instructions, live URLs | Must | ⬜ |
+| Final PROGRESS.md update with all metrics | Must | ⬜ |
+| Make sure train_phase2.ipynb has all cells run with output | Must | ⬜ |
+| Backup: push everything to GitHub | Must | ⬜ |
 
 ---
 
