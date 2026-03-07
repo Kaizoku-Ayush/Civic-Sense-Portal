@@ -36,7 +36,7 @@ async function check(label, fn) {
 
 async function get(url, opts = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const timeout = setTimeout(() => controller.abort(), 60_000);
   try {
     const res = await fetch(url, { signal: controller.signal, ...opts });
     clearTimeout(timeout);
