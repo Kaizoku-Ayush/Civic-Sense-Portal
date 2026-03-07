@@ -55,7 +55,10 @@ ENV/
 # (run prepare_dataset.py locally to regenerate)
 datasets/
 ai-service/data/
-ai-service/models/
+ai-service/models/*
+# Allow the directory placeholder and the production model in source control
+!ai-service/models/.gitkeep
+!ai-service/models/mobilenetv2_best.keras
 *.h5
 *.pkl
 *.pth

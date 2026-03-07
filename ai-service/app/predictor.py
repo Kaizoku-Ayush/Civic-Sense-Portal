@@ -55,10 +55,12 @@ class Predictor:
         import tensorflow as tf  # deferred import — keeps startup logs out of module scope
         tf.get_logger().setLevel("ERROR")
         if not MODEL_PATH.exists():
-            raise FileNotFoundError(
-                f"Model not found: {MODEL_PATH}\n"
-                "Run the Phase 2 training notebook first."
+            print(
+                f"⚠  Model not found at {MODEL_PATH}. "
+                "Starting in Groq-only mode — DNN classification disabled. "
+                "Commit ai-service/models/mobilenetv2_best.keras to enable the DNN pipeline."
             )
+            return  # _model stays None; service continues in Groq-only mode
         self._model = tf.keras.models.load_model(str(MODEL_PATH))
 
     def predict(self, img_bytes: bytes) -> dict:

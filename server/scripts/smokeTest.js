@@ -106,7 +106,8 @@ async function testAIService() {
     if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
     const body = await res.json();
     if (body.status !== 'ok') throw new Error(`status="${body.status}"`);
-    return `model=${body.model_loaded ? 'loaded' : 'NOT LOADED'}`;
+    const mode = body.model_loaded ? 'DNN+Groq' : 'Groq-only';
+    return `status=${body.status}, mode=${mode}`;
   });
 
   await check('GET /classes → valid class list', async () => {

@@ -30,6 +30,21 @@ _USER_PROMPT_TEMPLATE = (
     "RECOMMENDATION: [1 sentence on immediate action needed]"
 )
 
+# ── Groq-only: classify + describe when DNN model is unavailable ─────────────
+_VALID_CATEGORIES = ("pothole", "road_damage", "garbage")
+
+_CLASSIFY_PROMPT = (
+    "Analyse this civic issue image submitted by a citizen to a municipal reporting system.\n\n"
+    "Step 1 — Identify the issue. Choose EXACTLY one category from this list: "
+    "pothole, road_damage, garbage.\n"
+    "Step 2 — Describe and rate it.\n\n"
+    "Respond in exactly this format (no extra text):\n"
+    "CATEGORY: [pothole | road_damage | garbage]\n"
+    "DESCRIPTION: [1-2 sentences describing what you see]\n"
+    "SEVERITY_REASON: [1 sentence explaining urgency]\n"
+    "RECOMMENDATION: [1 sentence on immediate action]"
+)
+
 
 def _encode_image(img_bytes: bytes) -> str:
     return base64.standard_b64encode(img_bytes).decode("utf-8")
@@ -118,4 +133,69 @@ def _parse_response(text: str) -> dict[str, str]:
     if not result["description"]:
         result["description"] = text.strip()
 
+    return result
+
+
+async def classify_and_analyze_image(
+    img_bytes: bytes,
+    timeout: float = 20.0,
+) -> Optional[dict]:
+    """
+    Groq-only path: ask LLaMA-4 Scout to both classify and describe the image.
+    Used when the local DNN model is not available.
+
+    Returns dict with keys: category, description, severity_reason, recommendation
+    Returns None on failure.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        from groq import AsyncGroq
+    except ImportError:
+        return None
+
+    client = AsyncGroq(api_key=api_key)
+    b64    = _encode_image(img_bytes)
+
+    try:
+        response = await asyncio.wait_for(
+            client.chat.completions.create(
+                model=_GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+                            },
+                            {"type": "text", "text": _CLASSIFY_PROMPT},
+                        ],
+                    },
+                ],
+                max_tokens=300,
+                temperature=0.2,
+            ),
+            timeout=timeout,
+        )
+    except (asyncio.TimeoutError, Exception):
+        return None
+
+    raw = response.choices[0].message.content or ""
+    result = _parse_response(raw)
+
+    # Extract category from the CATEGORY: line
+    category = "garbage"  # safe default
+    for line in raw.strip().splitlines():
+        line = line.strip()
+        if line.startswith("CATEGORY:"):
+            candidate = line[len("CATEGORY:"):].strip().lower().replace(" ", "_")
+            if candidate in _VALID_CATEGORIES:
+                category = candidate
+            break
+
+    result["category"] = category
     return result

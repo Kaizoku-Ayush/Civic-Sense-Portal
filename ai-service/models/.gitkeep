@@ -1,0 +1,3 @@
+# This file ensures the models/ directory is tracked by Git.
+# Place mobilenetv2_best.keras here before deploying.
+# The AI service falls back to Groq-only mode if the model file is absent.

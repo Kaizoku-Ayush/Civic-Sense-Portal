@@ -16,7 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from .predictor import predictor
-from .groq_client import analyze_image
+from .groq_client import analyze_image, classify_and_analyze_image
+from .predictor import CLASS_BASE_SEVERITY, CONFIDENCE_BOOST, compute_phash
 
 # ── Max image upload size: 10 MB ──────────────────────────────────────────────
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
@@ -50,10 +51,13 @@ class HealthResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: load the Keras model once into memory
+    # Startup: load the Keras model once into memory (soft-fail → Groq-only mode)
     print("Loading MobileNetV2 classifier…")
     predictor.load()
-    print("Model ready.")
+    if predictor._model is not None:
+        print("Model ready — DNN + Groq pipeline active.")
+    else:
+        print("Running in Groq-only mode (DNN model not found).")
     yield
     # Shutdown (nothing to clean up for a stateless model)
 
@@ -128,6 +132,39 @@ async def predict(
         )
     if len(img_bytes) == 0:
         raise HTTPException(status_code=400, detail="Empty file received.")
+
+    # ── Groq-only mode (DNN model not loaded) ─────────────────────────────────
+    if predictor._model is None:
+        if not os.getenv("GROQ_API_KEY"):
+            raise HTTPException(
+                status_code=503,
+                detail="Service unavailable: DNN model not loaded and GROQ_API_KEY not set.",
+            )
+        groq_result = await classify_and_analyze_image(img_bytes)
+        if groq_result is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Groq classification failed. Check GROQ_API_KEY and retry.",
+            )
+        category = groq_result["category"]
+        # Use mid-range confidence for severity when Groq provides no numeric confidence
+        mid_confidence = 0.70
+        severity = float(
+            min(CLASS_BASE_SEVERITY.get(category, 0.5) + CONFIDENCE_BOOST * mid_confidence, 1.0)
+        )
+        return PredictResponse(
+            category       = category,
+            confidence     = mid_confidence,
+            severity_score = round(severity, 4),
+            all_probs      = {c: (mid_confidence if c == category else 0.0) for c in CLASS_BASE_SEVERITY},
+            image_hash     = compute_phash(img_bytes),
+            groq_analysis  = GroqAnalysis(
+                description     = groq_result.get("description",     ""),
+                severity_reason = groq_result.get("severity_reason", ""),
+                recommendation  = groq_result.get("recommendation",  ""),
+            ),
+            model_version  = "groq-only",
+        )
 
     # ── DNN inference ──────────────────────────────────────────────────────────
     try:
