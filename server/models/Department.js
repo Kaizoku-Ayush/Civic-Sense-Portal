@@ -26,13 +26,17 @@ const departmentSchema = new mongoose.Schema(
       enum: ['pothole', 'road_damage', 'garbage', 'streetlight', 'drainage', 'graffiti', 'other'],
       default: [],
     },
-    // GeoJSON polygon representing the jurisdiction zone
+    // GeoJSON polygon representing the jurisdiction zone (optional)
     zonePolygon: {
       type: {
         type: String,
         enum: ['Polygon'],
+        default: undefined,
       },
-      coordinates: [[[Number]]],
+      coordinates: {
+        type: [[[Number]]],
+        default: undefined,
+      },
     },
     isActive: {
       type: Boolean,
@@ -42,8 +46,8 @@ const departmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 2dsphere index for geospatial queries
-departmentSchema.index({ zonePolygon: '2dsphere' });
+// Sparse 2dsphere index — only indexes documents that actually have a polygon
+departmentSchema.index({ zonePolygon: '2dsphere' }, { sparse: true });
 
 const Department = mongoose.model('Department', departmentSchema);
 
