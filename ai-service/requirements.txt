@@ -1,5 +1,6 @@
-# Core ML stack
-tensorflow==2.20.*
+# Core ML stack — pin exact versions to match training environment
+tensorflow==2.20.0
+keras==3.13.2
 numpy>=2.0
 
 # Image processing
