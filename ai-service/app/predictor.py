@@ -61,7 +61,25 @@ class Predictor:
                 "Commit ai-service/models/mobilenetv2_best.keras to enable the DNN pipeline."
             )
             return  # _model stays None; service continues in Groq-only mode
-        self._model = tf.keras.models.load_model(str(MODEL_PATH))
+        try:
+            # Models saved with Keras 3.8+ include `quantization_config` in the
+            # Dense layer config.  Older Keras 3.x releases don't accept that kwarg
+            # and raise a ValueError.  Providing a thin subclass via custom_objects
+            # absorbs the unknown kwarg so loading succeeds on any Keras 3.x build.
+            class _CompatDense(tf.keras.layers.Dense):
+                def __init__(self, *args, quantization_config=None, **kwargs):
+                    super().__init__(*args, **kwargs)
+
+            self._model = tf.keras.models.load_model(
+                str(MODEL_PATH),
+                custom_objects={"Dense": _CompatDense},
+            )
+        except Exception as exc:
+            print(
+                f"⚠  Model failed to load ({exc}). "
+                "Falling back to Groq-only mode — DNN classification disabled."
+            )
+            self._model = None
 
     def predict(self, img_bytes: bytes) -> dict:
         """
