@@ -41,7 +41,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl">�</span>
+            <img src="/icons/nagarai-logo.svg" alt="NagarAI" className="w-8 h-8" />
             <span className="text-lg font-bold text-gray-900">Nagar<span className="text-indigo-600">AI</span></span>
           </Link>
 

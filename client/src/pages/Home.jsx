@@ -40,7 +40,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🌆</span>
+              <img src="/icons/nagarai-logo.svg" alt="NagarAI" className="w-8 h-8" />
               <span className="text-xl font-bold text-gray-900">Nagar<span className="text-indigo-600">AI</span></span>
             </div>
             <div className="hidden md:flex items-center gap-4">
@@ -195,7 +195,7 @@ const Home = () => {
       <footer className="bg-white border-t">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🌆</span>
+            <img src="/icons/nagarai-logo.svg" alt="NagarAI" className="w-6 h-6" />
             <span className="font-bold text-gray-900">Nagar<span className="text-indigo-600">AI</span></span>
             <span className="text-gray-400 text-sm">© 2026</span>
           </div>

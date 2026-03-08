@@ -8,10 +8,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/icon-192.svg', 'icons/icon-512.svg', 'offline.html'],
+      includeAssets: ['icons/nagarai-logo.svg', 'icons/icon-192.svg', 'icons/icon-512.svg', 'offline.html'],
       manifest: {
-        name: 'Civic Sense Portal',
-        short_name: 'CivicSense',
+        name: 'NagarAI',
+        short_name: 'NagarAI',
         description: 'AI-powered crowdsourced civic issue reporting and resolution system',
         theme_color: '#4f46e5',
         background_color: '#f9fafb',
@@ -22,13 +22,13 @@ export default defineConfig({
         categories: ['government', 'utilities'],
         icons: [
           {
-            src: 'icons/icon-192.svg',
+            src: 'icons/nagarai-logo.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any',
           },
           {
-            src: 'icons/icon-512.svg',
+            src: 'icons/nagarai-logo.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'any maskable',
