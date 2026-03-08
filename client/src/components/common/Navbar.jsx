@@ -41,17 +41,19 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl">🏙️</span>
-            <span className="text-lg font-bold text-gray-900">Civic<span className="text-indigo-600">Sense</span></span>
+            <span className="text-2xl">�</span>
+            <span className="text-lg font-bold text-gray-900">Nagar<span className="text-indigo-600">AI</span></span>
           </Link>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-1">
+            {navLink('/map', 'Map')}
+            {navLink('/issues', 'Issues')}
+            {navLink('/analytics', 'Analytics')}
+            {navLink('/leaderboard', '🏆 Board')}
             {isAuthenticated && (
               <>
-                {navLink('/map', 'Map')}
-                {navLink('/issues', 'Issues')}
-                {navLink('/submit', 'Report Issue')}
+                {navLink('/submit', 'Report')}
                 {navLink('/my-reports', 'My Reports')}
                 {user?.role === 'DEPARTMENT_STAFF' && navLink('/department', 'My Queue')}
                 {isAdmin && navLink('/admin', 'Admin')}
@@ -137,10 +139,12 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
+          {navLink('/map', '🗺️ Map')}
+          {navLink('/issues', '📋 Issues')}
+          {navLink('/analytics', '📊 Analytics')}
+          {navLink('/leaderboard', '🏆 Leaderboard')}
           {isAuthenticated ? (
             <>
-              {navLink('/map', '🗺️ Map')}
-              {navLink('/issues', '📋 Issues')}
               {navLink('/submit', '➕ Report Issue')}
               {navLink('/my-reports', '📁 My Reports')}
               {user?.role === 'DEPARTMENT_STAFF' && navLink('/department', '📥 My Queue')}

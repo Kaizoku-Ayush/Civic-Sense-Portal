@@ -1,5 +1,5 @@
 import express from 'express';
-import { Issue } from '../models/index.js';
+import { Issue, User } from '../models/index.js';
 
 const router = express.Router();
 
@@ -83,6 +83,21 @@ router.get('/heatmap', async (_req, res) => {
     }));
 
     return res.json(points);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error', code: 'SERVER_ERROR' });
+  }
+});
+
+// GET /api/analytics/leaderboard
+router.get('/leaderboard', async (_req, res) => {
+  try {
+    const users = await User.find({ civicPoints: { $gt: 0 } })
+      .select('name avatarUrl role civicPoints')
+      .sort({ civicPoints: -1 })
+      .limit(20)
+      .lean();
+    return res.json(users);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error', code: 'SERVER_ERROR' });

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -47,6 +47,14 @@ function makeCategoryIcon(category) {
   });
 }
 
+/** Severity → color for heatmap circles */
+function severityColor(score) {
+  if (score == null) return '#6366f1';
+  if (score >= 0.7) return '#ef4444';
+  if (score >= 0.4) return '#f97316';
+  return '#22c55e';
+}
+
 /** Fly to user's current position */
 function FlyToMe({ trigger }) {
   const map = useMap();
@@ -64,6 +72,7 @@ const MapDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState('all');
   const [flyTrigger, setFlyTrigger] = useState(0);
+  const [viewMode, setViewMode] = useState('markers'); // 'markers' | 'heatmap'
 
   // Fetch all issues
   useEffect(() => {
@@ -126,6 +135,16 @@ const MapDashboard = () => {
             {loading ? 'Loading…' : `${filtered.length} issue${filtered.length !== 1 ? 's' : ''}`}
           </span>
           <button
+            onClick={() => setViewMode(v => v === 'markers' ? 'heatmap' : 'markers')}
+            className={`text-xs px-3 py-1 rounded-full border transition ${
+              viewMode === 'heatmap'
+                ? 'bg-red-500 text-white border-red-500'
+                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            🔥 Heatmap
+          </button>
+          <button
             onClick={() => setFlyTrigger((t) => t + 1)}
             className="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition"
           >
@@ -168,6 +187,7 @@ const MapDashboard = () => {
 
           <FlyToMe trigger={flyTrigger} />
 
+          {viewMode === 'markers' ? (
           <MarkerClusterGroup chunkedLoading>
             {filtered.map((issue) => {
               if (!issue.location?.coordinates) return null;
@@ -219,21 +239,59 @@ const MapDashboard = () => {
               );
             })}
           </MarkerClusterGroup>
+          ) : (
+            <>
+              {filtered.map((issue) => {
+                if (!issue.location?.coordinates) return null;
+                const [issueLng, issueLat] = issue.location.coordinates;
+                const score = issue.aiSeverityScore ?? 0.5;
+                const color = severityColor(score);
+                return (
+                  <CircleMarker
+                    key={issue._id}
+                    center={[issueLat, issueLng]}
+                    radius={8 + score * 14}
+                    pathOptions={{ color, fillColor: color, fillOpacity: 0.6, weight: 1 }}
+                  >
+                    <Tooltip direction="top" offset={[0, -4]} opacity={0.9}>
+                      <span className="text-xs">
+                        {(issue.aiCategory || issue.category || 'issue').replace('_', ' ')} · severity {Math.round(score * 10)}/10
+                      </span>
+                    </Tooltip>
+                  </CircleMarker>
+                );
+              })}
+            </>
+          )}
         </MapContainer>
       </div>
 
       {/* Legend */}
       <div className="absolute bottom-8 right-4 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-[1000]">
-        <p className="text-xs font-semibold text-gray-600 mb-2">Legend</p>
-        {Object.entries(ICON_COLORS).map(([cat, color]) => (
-          <div key={cat} className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-            <span
-              className="inline-block w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: color }}
-            />
-            {cat.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-          </div>
-        ))}
+        {viewMode === 'markers' ? (
+          <>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Category</p>
+            {Object.entries(ICON_COLORS).map(([cat, color]) => (
+              <div key={cat} className="flex items-center gap-2 text-xs text-gray-600 mb-1">
+                <span
+                  className="inline-block w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: color }}
+                />
+                {cat.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Severity</p>
+            {[['#ef4444', 'High (≥0.7)'], ['#f97316', 'Med (0.4–0.7)'], ['#22c55e', 'Low (<0.4)']].map(([color, label]) => (
+              <div key={label} className="flex items-center gap-2 text-xs text-gray-600 mb-1">
+                <span className="inline-block w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                {label}
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

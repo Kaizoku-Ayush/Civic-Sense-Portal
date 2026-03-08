@@ -14,6 +14,8 @@ import MapDashboard from './pages/MapDashboard';
 import MyReports from './pages/MyReports';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import DeptDashboard from './pages/department/DeptDashboard';
+import Analytics from './pages/Analytics';
+import Leaderboard from './pages/Leaderboard';
 import './App.css';
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
           <Route path="/issues" element={<IssueList />} />
           <Route path="/issues/:id" element={<IssueDetail />} />
           <Route path="/map" element={<MapDashboard />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
 
           {/* Protected Routes */}
           <Route

@@ -239,6 +239,50 @@ MyReports.jsx      ✅
 
 ---
 
+### DAY 6.5 (Mar 9) — Visual Intelligence & Rebrand ✅ DONE
+
+**Goal:** Make the live product visually stunning and give it an identity that wins judges.
+
+| Task | Priority | Status |
+|------|----------|--------|
+| Rename project: **Civic Sense Portal → NagarAI** | Must | ✅ |
+| Update branding across Navbar, Home, README, package.json | Must | ✅ |
+| Public Analytics page `/analytics` — category bars, weekly trend line, stat cards | Must | ✅ |
+| Install Recharts for chart components | Must | ✅ |
+| Severity heatmap toggle on MapDashboard — CircleMarker mode with red/orange/green severity colouring | Must | ✅ |
+| "Similar issues nearby" strip in IssueSubmit — after AI result + location set, shows up to 3 existing reports within 500 m | Should | ✅ |
+| Add Analytics + Leaderboard to Navbar (public, no login required) | Must | ✅ |
+| Wire `/api/analytics/leaderboard` endpoint (top 20 by civicPoints) | Must | ✅ |
+
+**Delivered:**
+- `NagarAI` branding — logo, page titles, footer, README header
+- `client/src/pages/Analytics.jsx` — `/analytics` public page: 4 stat cards (total, resolved, avg hours, last 7 days), Recharts `BarChart` by category, `LineChart` 30-day timeline
+- Heatmap toggle button on MapDashboard — switches cluster markers ↔ severity-heat circles (green < 0.4, orange < 0.7, red ≥ 0.7), legendstrip at bottom
+- "Similar issues nearby" — fires after both AI result and pin location are set; calls `GET /api/issues?lat=&lng=&radius=500&limit=3`; shows dismissible strip with issue thumbnails + upvote link
+- `GET /api/analytics/leaderboard` — returns top 20 users sorted by `civicPoints`
+- Navbar updated: Map, Issues, Analytics public; Leaderboard public; auth-gated: Report, My Reports, Queue, Admin
+
+---
+
+### DAY 6.6 (Mar 10) — Landing Page & Leaderboard ✅ DONE
+
+**Goal:** First impression wins. Judges open the URL — they should see live numbers, not a placeholder.
+
+| Task | Priority | Status |
+|------|----------|--------|
+| Full Home.jsx rewrite — live stats counters, "How It Works" 3-step, CTA strip | Must | ✅ |
+| Stats pulled from `GET /api/analytics/summary` (real DB counts, not hardcoded 0s) | Must | ✅ |
+| Leaderboard page `/leaderboard` — top citizens ranked by civic points with badges | Should | ✅ |
+| Recent resolved issues strip on landing page | Should | ✅ |
+| Footer: NagarAI branding, links to Map / Analytics / GitHub | Should | ✅ |
+
+**Delivered:**
+- `client/src/pages/Home.jsx` — full rewrite: NagarAI hero, animated stat counters (total issues, resolved, avg resolution hours, categories tracked), "How It Works" 3-step graphic, recent 4 resolved issues strip, dual CTA (Report Issue / View Map), footer
+- `client/src/pages/Leaderboard.jsx` — `/leaderboard` public page: rank badges (🥇🥈🥉), civic points bar, user name/role chip, skeleton loading state
+- Both pages added to `App.jsx` routing and Navbar
+
+---
+
 ### DAY 7 (Mar 12) — Demo Prep
 
 **Goal:** Polished, submittable project.
