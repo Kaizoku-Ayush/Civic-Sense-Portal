@@ -1,5 +1,8 @@
 #md files
-/*.md
+*.md
+
+#docs
+docs/
 
 #exception files
 !README.md
