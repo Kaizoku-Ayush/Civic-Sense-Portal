@@ -119,6 +119,13 @@ router.patch('/issues/:id', async (req, res) => {
         comment: comment || `Status updated to ${status} by admin`,
         isPublic: true,
       });
+
+      // Award civic points to the reporter on key milestones
+      const POINT_AWARDS = { ACKNOWLEDGED: 5, RESOLVED: 10 };
+      const pts = POINT_AWARDS[status];
+      if (pts && issue.userId) {
+        await User.findByIdAndUpdate(issue.userId, { $inc: { civicPoints: pts } });
+      }
     }
 
     // Broadcast to all clients & specific department room
