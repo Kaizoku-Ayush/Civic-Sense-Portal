@@ -4,6 +4,7 @@
   "installCommand": "npm install",
   "framework": "vite",
   "rewrites": [
+    { "source": "/ai/:path*", "destination": "https://civic-sense-ai.onrender.com/:path*" },
     { "source": "/((?!assets|icons|sw.js|manifest.webmanifest|offline.html|favicon.ico).*)", "destination": "/index.html" }
   ],
   "headers": [

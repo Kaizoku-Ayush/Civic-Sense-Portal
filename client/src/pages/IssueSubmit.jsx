@@ -75,8 +75,9 @@ const IssueSubmit = () => {
       const form = new FormData();
       form.append('file', file);
       form.append('use_groq', 'true');
-      // Proxied via Vite: /ai → http://localhost:8000
-      const res = await axios.post('/ai/predict', form, {
+      // Use VITE_AI_SERVICE_URL if set (production direct), else relative /ai (Vite proxy or Vercel rewrite)
+      const aiBase = import.meta.env.VITE_AI_SERVICE_URL || '';
+      const res = await axios.post(`${aiBase}/ai/predict`, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 30000,
       });
