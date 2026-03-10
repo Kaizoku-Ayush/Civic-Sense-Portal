@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { Issue, IssueUpdate, Department } from '../models/index.js';
+import { Issue, IssueUpdate, Department, User } from '../models/index.js';
 import { classifyImage } from '../services/aiService.js';
 import { io } from '../app.js';
 
@@ -309,6 +309,14 @@ export async function upvoteIssue(req, res) {
     }
 
     await issue.save();
+
+    // Award/revoke +1 civicPoint on the reporter (not the voter)
+    if (issue.userId && !issue.userId.equals(userId)) {
+      await User.findByIdAndUpdate(issue.userId, {
+        $inc: { civicPoints: alreadyVoted ? -1 : 1 },
+      });
+    }
+
     return res.json({ upvotes: issue.upvotes, voted: !alreadyVoted });
   } catch (err) {
     console.error('upvoteIssue error:', err);
