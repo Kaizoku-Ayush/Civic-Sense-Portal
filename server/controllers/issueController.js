@@ -146,7 +146,11 @@ export async function createIssue(req, res) {
     return res.status(201).json(responsePayload);
   } catch (err) {
     console.error('createIssue error:', err);
-    return res.status(500).json({ error: 'Failed to create issue', code: 'SERVER_ERROR' });
+    return res.status(500).json({
+      error: 'Failed to create issue',
+      detail: err.message,
+      code: 'SERVER_ERROR',
+    });
   }
 }
 
