@@ -163,11 +163,20 @@ export async function listIssues(req, res) {
       page = 1,
       limit = 20,
       sort = '-createdAt',
+      myIssues,
     } = req.query;
 
     const filter = {};
     if (category) filter.category = category;
     if (status) filter.status = status.toUpperCase();
+
+    // Filter to the requesting user's own issues
+    if (myIssues === 'true') {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required', code: 'UNAUTHENTICATED' });
+      }
+      filter.userId = req.user._id;
+    }
 
     // Geo filter — use $near only if lat+lng provided
     if (lat && lng) {

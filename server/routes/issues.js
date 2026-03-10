@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { authenticate, authorize } from '../middleware/auth.js';
+import { authenticate, authorize, authenticateOptional } from '../middleware/auth.js';
 import { Issue } from '../models/index.js';
 import {
   createIssue,
@@ -24,7 +24,7 @@ const upload = multer({
   },
 });
 
-router.get('/', listIssues);
+router.get('/', authenticateOptional, listIssues);
 
 // GET /api/issues/department — department staff see only their assigned queue
 router.get('/department', authenticate, authorize(['DEPARTMENT_STAFF', 'ADMIN']), async (req, res) => {

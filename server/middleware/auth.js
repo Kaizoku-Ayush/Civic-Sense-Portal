@@ -55,6 +55,28 @@ export const authenticate = async (req, res, next) => {
 };
 
 /**
+ * Optional authentication middleware — does not reject unauthenticated requests.
+ * Sets req.user if a valid Bearer token is present, otherwise continues as guest.
+ */
+export const authenticateOptional = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return next();
+
+    const idToken = authHeader.split('Bearer ')[1];
+    const decodedToken = await verifyIdToken(idToken);
+    const user = await User.findOne({ firebaseUid: decodedToken.uid });
+    if (user) {
+      req.user = user;
+      req.firebaseUser = decodedToken;
+    }
+  } catch (_) {
+    // ignore auth errors — treat as guest
+  }
+  next();
+};
+
+/**
  * Middleware to check if user has specific role(s)
  * Usage: authorize(['ADMIN', 'DEPARTMENT_STAFF'])
  */
