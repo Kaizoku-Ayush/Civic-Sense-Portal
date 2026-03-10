@@ -122,7 +122,7 @@ const IssueSubmit = () => {
     e.preventDefault();
     if (!imageFile) return;
     if (lat == null || lng == null) {
-      setSubmitError('Please set a location on the map.');
+      setSubmitError({ msg: 'Please set a location on the map.' });
       return;
     }
 
@@ -143,9 +143,12 @@ const IssueSubmit = () => {
       addToast('Issue submitted successfully! 🎉', 'success');
       navigate(`/issues/${res.data._id}`, { state: { fresh: true } });
     } catch (err) {
-      const msg = err.response?.data?.error || 'Failed to submit issue. Please try again.';
-      setSubmitError(msg);
-      addToast(msg, 'error');
+      const status = err.response?.status;
+      const data   = err.response?.data;
+      const msg    = data?.error || data?.message || err.message || 'Failed to submit issue. Please try again.';
+      const detail = data ? JSON.stringify(data, null, 2) : null;
+      setSubmitError({ msg, status, detail });
+      addToast(`Submit failed${status ? ` (${status})` : ''}: ${msg}`, 'error');
       setSubmitting(false);
     }
   };
@@ -387,8 +390,13 @@ const IssueSubmit = () => {
 
           {/* ── Submit ─────────────────────────────────────────────────── */}
           {submitError && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-              {submitError}
+            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 space-y-1">
+              <p className="font-semibold">
+                {submitError.status ? `Error ${submitError.status}: ` : ''}{submitError.msg ?? submitError}
+              </p>
+              {submitError.detail && (
+                <pre className="text-xs bg-red-100 rounded p-2 overflow-x-auto whitespace-pre-wrap">{submitError.detail}</pre>
+              )}
             </div>
           )}
 
