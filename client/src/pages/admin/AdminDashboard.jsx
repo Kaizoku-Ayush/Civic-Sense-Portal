@@ -322,12 +322,12 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-sm text-gray-500 mt-0.5">Manage and resolve civic issues</p>
           </div>
-          <a
-            href="/admin/users"
+          <Link
+            to="/admin/users"
             className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
           >
             Manage Users →
-          </a>
+          </Link>
         </div>
 
         {/* Analytics Cards */}

@@ -13,6 +13,7 @@ import IssueDetail from './pages/IssueDetail';
 import MapDashboard from './pages/MapDashboard';
 import MyReports from './pages/MyReports';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
 import DeptDashboard from './pages/department/DeptDashboard';
 import Analytics from './pages/Analytics';
 import Leaderboard from './pages/Leaderboard';
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminUsers />
               </ProtectedRoute>
             }
           />
