@@ -89,7 +89,10 @@ const IssueSubmit = () => {
         setDescription((prev) => prev || res.data.groq_analysis.description);
       }
     } catch (err) {
-      setAiError('AI preview unavailable — you can still submit manually.');
+      const status = err.response?.status;
+      const detail = err.response?.data?.detail || err.response?.data?.error || err.message;
+      const label  = status ? `${status}: ${detail}` : detail;
+      setAiError(`AI preview failed${label ? ` — ${label}` : ''}. You can still submit manually.`);
     } finally {
       setAiLoading(false);
     }
