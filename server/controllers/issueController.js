@@ -3,15 +3,14 @@ import { Issue, IssueUpdate, Department } from '../models/index.js';
 import { classifyImage } from '../services/aiService.js';
 import { io } from '../app.js';
 
-// Cloudinary is configured via env vars (CLOUDINARY_CLOUD_NAME, etc.)
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 /** Upload buffer to Cloudinary and return secure_url. */
 async function uploadToCloudinary(buffer, mimeType) {
+  // Configure lazily so env vars are read after dotenv.config() has run
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: 'civic-sense/issues', resource_type: 'image' },
