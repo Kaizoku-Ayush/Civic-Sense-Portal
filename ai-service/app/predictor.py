@@ -56,18 +56,18 @@ class Predictor:
         tf.get_logger().setLevel("ERROR")
         if not MODEL_PATH.exists():
             print(
-                f"⚠  Model not found at {MODEL_PATH}. "
-                "Starting in Groq-only mode — DNN classification disabled. "
+                f"[WARN] Model not found at {MODEL_PATH}. "
+                "Starting in Groq-only mode -- DNN classification disabled. "
                 "Commit ai-service/models/mobilenetv2_best.keras to enable the DNN pipeline."
             )
             return  # _model stays None; service continues in Groq-only mode
         try:
             self._model = tf.keras.models.load_model(str(MODEL_PATH))
-            print("✓  MobileNetV2 classifier loaded — running in DNN+Groq mode.")
+            print("[OK] MobileNetV2 classifier loaded -- running in DNN+Groq mode.")
         except Exception as exc:
             print(
-                f"⚠  Model failed to load ({type(exc).__name__}: {exc}). "
-                "Falling back to Groq-only mode — DNN classification disabled."
+                f"[WARN] Model failed to load ({type(exc).__name__}: {exc}). "
+                "Falling back to Groq-only mode -- DNN classification disabled."
             )
             self._model = None
 

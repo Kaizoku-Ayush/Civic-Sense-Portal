@@ -52,10 +52,10 @@ class HealthResponse(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: load the Keras model once into memory (soft-fail → Groq-only mode)
-    print("Loading MobileNetV2 classifier…")
+    print("Loading MobileNetV2 classifier...")
     predictor.load()
     if predictor._model is not None:
-        print("Model ready — DNN + Groq pipeline active.")
+        print("Model ready -- DNN + Groq pipeline active.")
     else:
         print("Running in Groq-only mode (DNN model not found).")
     yield
