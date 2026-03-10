@@ -229,7 +229,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Problem Statement by [Organization Name]
 - Dataset providers: RDD2022, TACO, Kaggle
 - Inspiration from civic tech initiatives worldwide
 
