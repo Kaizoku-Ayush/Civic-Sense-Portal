@@ -1,12 +1,82 @@
 import express from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { Issue, User, Department, IssueUpdate } from '../models/index.js';
+import { Issue, User, Department, IssueUpdate, ChatEvent } from '../models/index.js';
 import { io } from '../app.js';
 
 const router = express.Router();
 
 // All admin routes require authentication + admin role
 router.use(authenticate, authorize(['ADMIN']));
+
+// GET /api/admin/chat-analytics?days=7
+router.get('/chat-analytics', async (req, res) => {
+  try {
+    const days = Math.min(90, Math.max(1, parseInt(req.query.days, 10) || 7));
+    const since = new Date(Date.now() - days * 24 * 3_600_000);
+
+    const baseMatch = { createdAt: { $gte: since } };
+
+    const [
+      totalQueries,
+      successfulQueries,
+      followUpQueries,
+      avgLatency,
+      byIntent,
+      byScope,
+      topCities,
+      recent,
+    ] = await Promise.all([
+      ChatEvent.countDocuments(baseMatch),
+      ChatEvent.countDocuments({ ...baseMatch, success: true }),
+      ChatEvent.countDocuments({ ...baseMatch, followUpNeeded: true }),
+      ChatEvent.aggregate([
+        { $match: baseMatch },
+        { $group: { _id: null, value: { $avg: '$latencyMs' } } },
+      ]),
+      ChatEvent.aggregate([
+        { $match: baseMatch },
+        { $group: { _id: '$intent', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 8 },
+      ]),
+      ChatEvent.aggregate([
+        { $match: baseMatch },
+        { $group: { _id: '$scope', count: { $sum: 1 } } },
+      ]),
+      ChatEvent.aggregate([
+        { $match: { ...baseMatch, city: { $nin: [null, ''] } } },
+        { $group: { _id: '$city', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 5 },
+      ]),
+      ChatEvent.find(baseMatch)
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .select('intent scope city success followUpNeeded latencyMs createdAt')
+        .lean(),
+    ]);
+
+    const followUpRate = totalQueries > 0 ? Math.round((followUpQueries / totalQueries) * 1000) / 10 : 0;
+    const successRate = totalQueries > 0 ? Math.round((successfulQueries / totalQueries) * 1000) / 10 : 0;
+
+    return res.json({
+      days,
+      totalQueries,
+      successfulQueries,
+      followUpQueries,
+      followUpRate,
+      successRate,
+      avgLatencyMs: avgLatency[0]?.value ? Math.round(avgLatency[0].value) : null,
+      byIntent: byIntent.map((row) => ({ intent: row._id || 'unknown', count: row.count })),
+      byScope: byScope.map((row) => ({ scope: row._id || 'unknown', count: row.count })),
+      topCities: topCities.map((row) => ({ city: row._id, count: row.count })),
+      recent,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error', code: 'SERVER_ERROR' });
+  }
+});
 
 // GET /api/admin/stats — analytics summary for admin dashboard
 router.get('/stats', async (_req, res) => {

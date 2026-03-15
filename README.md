@@ -24,6 +24,11 @@ NagarAI empowers citizens to report civic issues (potholes, road damage, garbage
 
 - 🤖 **AI Auto-Classification** — MobileNetV2 DNN (86%+ accuracy, ~50 ms inference) classifies pothole / road damage / garbage instantly
 - 🧠 **LLM Issue Description** — Groq LLaMA-4 Scout Vision generates human-readable description, severity reason, and repair recommendation
+- 💬 **Civic Chat Assistant** — Floating chatbot answers report counts, status breakdowns, trends, and leaderboard questions
+- 🔁 **Chat UX Enhancements** — Copy answer + Regenerate answer actions for faster reuse and retry
+- 👍 **Answer Feedback Loop** — Thumbs up/down feedback endpoint stores per-intent quality signals
+- ⏱️ **Friendly Rate-Limit Handling** — Clear in-chat guidance when request limits are hit (HTTP 429)
+- ❓ **Built-in Capability Sheet** — “What I Can Answer” help modal with practical examples
 - 📊 **Smart Severity Scoring** — Analytical formula: `base_severity[class] + 0.15 × confidence` gives 0–1 urgency score
 - 🔍 **Duplicate Detection** — pHash (perceptual hash) + 50 m geo-proximity check prevents redundant reports
 - 🗺️ **Interactive Map Dashboard** — Leaflet.js with clustered markers, severity heatmap toggle, live Socket.io pins
@@ -189,6 +194,25 @@ Image Upload
        ├─ severity reason
        └─ actionable recommendation
 ```
+
+   ## 💬 Chatbot Additions (March 2026)
+
+   ### Chat Endpoints
+
+   - `POST /api/chat/ask` — asks civic analytics questions
+   - `POST /api/chat/feedback` — captures thumbs up/down feedback
+
+   ### Chat Analytics
+
+   - `GET /api/admin/chat-analytics?days=7` — admin-only usage insights (success rate, follow-up rate, latency, top intents)
+
+   ### UX Additions Implemented
+
+   - Copy answer action
+   - Regenerate answer action
+   - Friendly 429 message with retry guidance
+   - What-I-can-answer modal
+   - Per-answer thumbs up/down feedback capture
 
 | Component | Detail |
 |-----------|--------|

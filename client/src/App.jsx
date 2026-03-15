@@ -18,6 +18,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import DeptDashboard from './pages/department/DeptDashboard';
 import Analytics from './pages/Analytics';
 import Leaderboard from './pages/Leaderboard';
+import ChatWidget from './components/common/ChatWidget';
 import './App.css';
 
 function App() {
@@ -121,6 +122,7 @@ function App() {
             }
           />
           </Routes>
+          <ChatWidget />
           </ToastProvider>
         </AuthProvider>
       </Router>

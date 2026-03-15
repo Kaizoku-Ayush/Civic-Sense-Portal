@@ -78,6 +78,7 @@ app.get('/api', (_req, res) => {
       issues: '/api/issues',
       admin: '/api/admin',
       analytics: '/api/analytics',
+      chat: '/api/chat',
     }
   });
 });

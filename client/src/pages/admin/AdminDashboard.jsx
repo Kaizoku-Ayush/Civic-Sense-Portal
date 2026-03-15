@@ -170,6 +170,7 @@ function IssueRow({ issue, departments, onUpdate, selected, onToggle }) {
 export default function AdminDashboard() {
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
+  const [chatStats, setChatStats] = useState(null);
   const [issues, setIssues] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [total, setTotal] = useState(0);
@@ -194,8 +195,12 @@ export default function AdminDashboard() {
   // ── Fetch stats ────────────────────────────────────────────────────────────
   const fetchStats = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/stats');
-      setStats(data);
+      const [{ data: statsData }, { data: chatData }] = await Promise.all([
+        api.get('/admin/stats'),
+        api.get('/admin/chat-analytics', { params: { days: 7 } }),
+      ]);
+      setStats(statsData);
+      setChatStats(chatData);
     } catch (err) {
       console.error('Stats fetch error:', err);
     } finally {
@@ -350,6 +355,48 @@ export default function AdminDashboard() {
               color="gray"
               sub="across all issues"
             />
+          </div>
+        )}
+
+        {/* Chat Analytics */}
+        {chatStats && (
+          <div className="mb-6 bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-800">Chat Assistant Analytics (7 days)</h2>
+              <span className="text-xs text-gray-500">{chatStats.totalQueries} queries</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+              <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3">
+                <p className="text-xs text-indigo-700 font-medium">Success Rate</p>
+                <p className="text-lg font-bold text-indigo-900">{chatStats.successRate}%</p>
+              </div>
+              <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">
+                <p className="text-xs text-amber-700 font-medium">Follow-up Rate</p>
+                <p className="text-lg font-bold text-amber-900">{chatStats.followUpRate}%</p>
+              </div>
+              <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+                <p className="text-xs text-emerald-700 font-medium">Avg Latency</p>
+                <p className="text-lg font-bold text-emerald-900">{chatStats.avgLatencyMs ?? '—'} ms</p>
+              </div>
+              <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
+                <p className="text-xs text-gray-600 font-medium">Successful</p>
+                <p className="text-lg font-bold text-gray-800">{chatStats.successfulQueries}</p>
+              </div>
+            </div>
+
+            {Array.isArray(chatStats.byIntent) && chatStats.byIntent.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {chatStats.byIntent.map((intentRow) => (
+                  <span
+                    key={intentRow.intent}
+                    className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200"
+                  >
+                    {intentRow.intent}: {intentRow.count}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
