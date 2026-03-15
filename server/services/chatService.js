@@ -133,6 +133,15 @@ function setCached(key, value) {
   responseCache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
 }
 
+// Periodically prune stale cache entries to prevent unbounded memory growth.
+// unref() lets the process exit without waiting for this timer.
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of responseCache.entries()) {
+    if (now > entry.expiresAt) responseCache.delete(key);
+  }
+}, 60_000).unref();
+
 async function getStatusBreakdown(filter = {}) {
   const rows = await Issue.aggregate([
     { $match: filter },
@@ -280,7 +289,9 @@ async function maybePolishWithGroq({ question, draftAnswer, facts }) {
 
     const content = response?.data?.choices?.[0]?.message?.content?.trim();
     return content || draftAnswer;
-  } catch {
+  } catch (err) {
+    const status = err?.response?.status;
+    console.error('Groq polish failed:', status ? `HTTP ${status}` : err.message);
     return draftAnswer;
   }
 }

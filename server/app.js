@@ -8,6 +8,11 @@ import routes from './routes/index.js';
 
 dotenv.config();
 
+// Warn early if the Groq API key is missing — chat responses will be basic template answers without it.
+if (!process.env.GROQ_API_KEY) {
+  console.warn('⚠️  WARNING: GROQ_API_KEY is not set. Chat assistant will return basic template answers instead of AI-polished responses.');
+}
+
 // Connect to MongoDB
 connectDB();
 

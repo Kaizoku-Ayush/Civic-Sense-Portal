@@ -44,6 +44,10 @@ services:
         sync: false          # set after Vercel deploy, e.g. https://civic-sense.vercel.app
       - key: SKIP_FIREBASE_AUTH
         value: false
+      - key: GROQ_API_KEY
+        sync: false          # get free key at https://console.groq.com — required for chat AI polishing
+      - key: GROQ_TEXT_MODEL
+        value: llama-3.3-70b-versatile
 
   # ─── 2. Python FastAPI AI Service ─────────────────────────────────────────
   - type: web
