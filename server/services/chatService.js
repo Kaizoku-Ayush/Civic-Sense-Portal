@@ -84,12 +84,24 @@ function parseTopN(question, fallback = 5) {
 }
 
 function extractCity(question) {
-  const match = question.match(/\bin\s+([a-zA-Z\s]{2,40})$/i)
-    || question.match(/\bfor\s+([a-zA-Z\s]{2,40})$/i)
-    || question.match(/\b(?:city|area)\s*[:\-]?\s*([a-zA-Z\s]{2,40})/i);
+  const q = String(question || '').trim();
+  const normalized = normalizeText(q);
+
+  // Guard: avoid treating "city-wide" as a city name.
+  if (/(^|\s)city\s*-?\s*wide(\s|$)/i.test(normalized)) {
+    return null;
+  }
+
+  const match = q.match(/\b(?:in|for)\s+([a-zA-Z][a-zA-Z\s]{1,39})(?=$|[?.!,;])/i)
+    || q.match(/\b(?:city|area)\s*[:\-]\s*([a-zA-Z][a-zA-Z\s]{1,39})(?=$|[?.!,;])/i);
 
   if (!match) return null;
-  const city = String(match[1] || '').trim().replace(/\s+/g, ' ');
+  const city = String(match[1] || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[?.!,;]+$/g, '');
+
+  if (/^city\s*-?\s*wide$/i.test(city)) return null;
   if (!city || city.length < 2) return null;
   return city;
 }
@@ -155,13 +167,19 @@ async function getLeaderboard(limit = 5) {
     .lean();
 }
 
+function sanitizeDisplayName(name) {
+  const value = String(name || '').trim();
+  if (!value) return 'Citizen';
+  // Prevent exposing email-style values in leaderboard responses.
+  if (value.includes('@')) return 'Citizen';
+  return value;
+}
+
 async function getTopContributorProfile() {
-  const top = await User.findOne({ civicPoints: { $gt: 0 } })
+  return User.findOne({ civicPoints: { $gt: 0 } })
     .select('name role civicPoints avatarUrl createdAt')
     .sort({ civicPoints: -1 })
     .lean();
-
-  return top;
 }
 
 async function getResolvedLast7Days(filter = {}) {
@@ -196,7 +214,7 @@ function buildDraftAnswer({ intent, scope, total, statuses, leaders, isLoggedIn,
 
   if (intent === 'contributor_profile') {
     if (!topContributor) return 'There is no top contributor yet because no civic points are recorded.';
-    return `${topContributor.name} is currently rank 1 with ${topContributor.civicPoints} civic points. Role: ${topContributor.role}.`;
+    return `${sanitizeDisplayName(topContributor.name)} is currently rank 1 with ${topContributor.civicPoints} civic points. Role: ${topContributor.role}.`;
   }
 
   if (intent === 'leaderboard') {
@@ -205,7 +223,7 @@ function buildDraftAnswer({ intent, scope, total, statuses, leaders, isLoggedIn,
     }
     const header = leaders
       .slice(0, 3)
-      .map((u, idx) => `${idx + 1}. ${u.name} (${u.civicPoints} pts)`)
+      .map((u, idx) => `${idx + 1}. ${sanitizeDisplayName(u.name)} (${u.civicPoints} pts)`)
       .join('; ');
     return `Top contributors right now: ${header}.`;
   }
@@ -265,6 +283,11 @@ async function maybePolishWithGroq({ question, draftAnswer, facts }) {
   } catch {
     return draftAnswer;
   }
+}
+
+function shouldPolishWithGroq(intent) {
+  // Keep analytics/count/leaderboard answers deterministic and non-hallucinated.
+  return !['report_count', 'leaderboard', 'contributor_profile', 'resolution_trend'].includes(intent);
 }
 
 export async function answerChatQuestion({ question, context = {}, user = null }) {
@@ -363,7 +386,9 @@ export async function answerChatQuestion({ question, context = {}, user = null }
     resolutionTrend,
   };
 
-  const answer = await maybePolishWithGroq({ question: text, draftAnswer, facts });
+  const answer = shouldPolishWithGroq(intent)
+    ? await maybePolishWithGroq({ question: text, draftAnswer, facts })
+    : draftAnswer;
 
   const result = {
     answer,

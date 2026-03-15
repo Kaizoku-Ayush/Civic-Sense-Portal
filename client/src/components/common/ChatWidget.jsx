@@ -241,7 +241,11 @@ const ChatWidget = () => {
         className="fixed bottom-5 right-5 z-[70] h-14 w-14 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition"
         aria-label="Open civic assistant"
       >
-        {open ? '×' : 'AI'}
+        {open ? (
+          '×'
+        ) : (
+          <img src="/icons/nagarai-logo.svg" alt="AI" className="w-8 h-8 mx-auto" />
+        )}
       </button>
 
       {open && (
