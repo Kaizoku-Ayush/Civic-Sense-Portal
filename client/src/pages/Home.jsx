@@ -132,7 +132,7 @@ const Home = () => {
           <h2 className="text-3xl font-bold text-white text-center mb-12">Why NagarAI?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: '🧠', title: '86% AI Accuracy',         desc: 'MobileNetV2 trained on 6,786 real-world civic images across potholes, road damage, and garbage.' },
+              { icon: '🧠', title: '87.4% AI Accuracy',       desc: 'MobileNetV2 Phase 2 fine-tuning on 6,786 real-world civic images across potholes, road damage, and garbage.' },
               { icon: '🔴', title: 'Severity Scoring',        desc: 'Every issue gets a 0–1 severity score. Critical issues are flagged automatically for urgent dispatch.' },
               { icon: '🔁', title: 'Duplicate Detection',     desc: 'pHash image fingerprinting + geo-proximity prevents 100+ spam reports of the same pothole.' },
               { icon: '⚡', title: 'Real-time via Socket.io', desc: 'New reports appear on the live map instantly. Admins see queue updates the moment they happen.' },

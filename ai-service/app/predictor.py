@@ -50,6 +50,7 @@ class Predictor:
 
     def __init__(self) -> None:
         self._model = None
+        self.model_version = "unknown"
 
     def load(self) -> None:
         import tensorflow as tf  # deferred import — keeps startup logs out of module scope
@@ -63,6 +64,7 @@ class Predictor:
             return  # _model stays None; service continues in Groq-only mode
         try:
             self._model = tf.keras.models.load_model(str(MODEL_PATH))
+            self.model_version = f"keras:{MODEL_PATH.name}"
             print("[OK] MobileNetV2 classifier loaded -- running in DNN+Groq mode.")
         except Exception as exc:
             print(
@@ -70,6 +72,7 @@ class Predictor:
                 "Falling back to Groq-only mode -- DNN classification disabled."
             )
             self._model = None
+            self.model_version = "unavailable"
 
     def predict(self, img_bytes: bytes) -> dict:
         """

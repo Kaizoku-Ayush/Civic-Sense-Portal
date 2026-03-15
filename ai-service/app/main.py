@@ -38,7 +38,7 @@ class PredictResponse(BaseModel):
     all_probs:     dict[str, float]
     image_hash:    str
     groq_analysis: Optional[GroqAnalysis] = None
-    model_version: str = "mobilenetv2-phase2"
+    model_version: str = "unknown"
 
 
 class HealthResponse(BaseModel):
@@ -195,4 +195,5 @@ async def predict(
         all_probs      = dnn_result["all_probs"],
         image_hash     = dnn_result["image_hash"],
         groq_analysis  = groq_analysis,
+        model_version  = predictor.model_version,
     )
