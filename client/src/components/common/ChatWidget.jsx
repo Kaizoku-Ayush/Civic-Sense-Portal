@@ -244,7 +244,7 @@ const ChatWidget = () => {
         {open ? (
           '×'
         ) : (
-          <img src="/icons/nagarai-logo.svg" alt="AI" className="w-8 h-8 mx-auto" />
+          <img src="/icons/chatbot-logo.svg" alt="AI" className="w-8 h-8 mx-auto" />
         )}
       </button>
 
