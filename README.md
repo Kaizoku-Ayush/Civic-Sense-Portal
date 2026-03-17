@@ -8,7 +8,7 @@
 [![Deployed](https://img.shields.io/badge/Status-Live-brightgreen)](https://civic-sense-portal.vercel.app)
 
 **AI-Powered Crowdsourced Civic Issue Reporting System**  
-*Problem Statement #25031 — Built in 7 days*
+*Problem Statement #25031*
 
 NagarAI empowers citizens to report civic issues (potholes, road damage, garbage overflow) with a single photo. A custom-trained MobileNetV2 DNN auto-classifies the issue in ~50 ms, Groq LLaMA-4 Scout generates a natural-language description, and municipal staff get a real-time dashboard to assign, track, and resolve reports.
 
