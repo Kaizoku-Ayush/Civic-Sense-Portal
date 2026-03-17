@@ -177,7 +177,7 @@ Image Upload
 | Component | Detail |
 |-----------|--------|
 | **Base model** | MobileNetV2 (ImageNet pre-trained, depthwise separable convolutions) |
-| **Training** | Phase 1 frozen backbone → 86.04% val_acc; Phase 2 top-30 fine-tuned |
+| **Training** | Phase 1 frozen backbone → 86.04% val_acc; Phase 2 → 87.4% top-30 fine-tuned |
 | **Dataset** | 6,786 images (pothole + road_damage + garbage), 70/15/15 split, seed=42 |
 | **Inference** | ~50 ms CPU, float32 Keras model served via FastAPI |
 | **LLM** | Groq LLaMA-4 Scout Vision — structured prompt → description + recommendation |
