@@ -152,22 +152,6 @@ civic-sense-portal/
    - Copy the connection string to `server/.env` as `MONGODB_URI`
    - Collections and indexes are created automatically on first run
 
-## 📖 Development Sprint (7 Days — Mar 6–12, 2026)
-
-| Day | Focus | Status |
-|-----|-------|--------|
-| Day 1 | FastAPI AI Microservice | ✅ Done |
-| Day 2 | Backend Issues API | ✅ Done |
-| Day 3 | Frontend Core | ✅ Done |
-| Day 4 | Admin Portal + Real-time | ✅ Done |
-| Day 5 | PWA + Polish | ✅ Done |
-| Day 6 | Deploy Everything | ✅ Done |
-| Day 6.5 | Visual Intelligence & Rebrand → NagarAI | ✅ Done |
-| Day 6.6 | Landing Page & Leaderboard | ✅ Done |
-| Day 7 | Demo Prep & Final Push | ✅ Done |
-
-See [ROADMAP.md](ROADMAP.md) for detailed day-by-day tasks and [DEV_REPORT.md](DEV_REPORT.md) for the full technical report.
-
 ## 🎯 Problem Statement
 
 **ID**: 25031  
