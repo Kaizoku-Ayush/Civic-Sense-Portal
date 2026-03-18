@@ -30,6 +30,14 @@ function DraggableMarker({ position, onChange }) {
   );
 }
 
+function FlyTo({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat != null && lng != null) map.flyTo([lat, lng], 15, { animate: true });
+  }, [lat, lng]);
+  return null;
+}
+
 function MapInner({ lat, lng, onChange, zoom, scrollWheelZoom }) {
   const center = lat != null ? [lat, lng] : [20.5937, 78.9629];
   return (
@@ -114,7 +122,7 @@ const LocationPicker = ({ lat, lng, onChange, height = '200px' }) => {
 
           {/* Map fills remaining height */}
           <div className="flex-1 min-h-0">
-            <MapInner lat={lat} lng={lng} onChange={onChange} zoom={zoom} scrollWheelZoom />
+            <MapInner lat={lat} lng={lng} onChange={onChange} zoom={zoom} scrollWheelZoom flyOnChange/>
           </div>
         </div>,
         document.body
